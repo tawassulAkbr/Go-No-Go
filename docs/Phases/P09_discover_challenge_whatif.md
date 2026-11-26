@@ -18,11 +18,13 @@
 7. **Survivors → Validate workflow** (parallel, within budget). **Rank** by verdict (GO > PIVOT > NO-GO), then score, then confidence. Each result = verdict card + short reason.
 8. Demonstrate the **profile effect**: same idea → GO for a team with 200 free hours, NO-GO for a solo student with 20 hours.
 
+**Discover state machine (M3, brief §3 / M3 row):** like Validate, an explicit enum + transition table, unit-tested: `INTAKE → NICHES → IDEATE → GAP_CHECK → SKEPTIC → CRITIC → (loop, ≤ 3 rounds) → VALIDATE_SURVIVORS → RANK → CARD`, plus `WAIT_APPROVAL` over budget.
+
 ### 9B. Challenge (U8), What-if (U7), Compare/history (U9)
 - `POST /ideas/{id}/challenge {claim_id}` → Skeptic argues the opposite → M12 checks evidence → **defend** or **remove** the claim; accepted objections reduce score by 0.5 (max 1.0) and confidence by 0.1 **via M11**, producing an updated verdict.
 - `POST /ideas/{id}/whatif {change}` → create **idea version 2**, **re-run only the scorers that depend on the change**, then M11; the UI shows v1 vs v2.
 - `GET /ideas`, `/ideas/{id}/versions`, `/compare?a=&b=` → history list + side-by-side on all six dimensions (UI radar/table).
 - **INSUFFICIENT EVIDENCE (U10):** when M11 abstains, the card lists missing evidence (e.g. "only 1 source / 1 platform") and does **not** guess.
 
-**Tests:** debate stops at 3 rounds; defeated idea is dropped; every idea has gap evidence ids; what-if only re-runs dependants; challenge penalties applied by M11 (not by an LLM).
+**Tests:** Discover transition table (every state and edge); debate stops at 3 rounds; defeated idea is dropped; every idea has gap evidence ids; what-if only re-runs dependants; challenge penalties applied by M11 (not by an LLM).
 **Screenshots:** Discover results, challenge, what-if v2, INSUFFICIENT EVIDENCE card, compare view.

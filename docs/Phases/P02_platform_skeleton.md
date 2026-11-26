@@ -38,16 +38,16 @@
    kubectl config set-context --current --namespace=idea-validator
    ```
    *Why k3d:* k3s ships an embedded NetworkPolicy controller, Traefik (ingress) and metrics-server (for `kubectl top` and the autoscaler). Re-create if needed: `k3d cluster delete idea-validator`.
-3. **Service template** `services/_template/` (copy for each module): `src/main.py` with FastAPI app exposing `GET /health`, `GET /ready`, `GET /metrics` (`prometheus-client`), reading config from environment. `requirements.txt` with **pinned** versions. `tests/test_health.py`.
+3. **Service template** `services/_template/` (copy for each module): `src/main.py` with FastAPI app exposing `GET /health`, `GET /ready`, `GET /metrics` (`prometheus-client`), reading config from environment. `requirements.txt` with **pinned** versions. `tests/test_health.py`. Also create the shared `libs/tracing` stub here (a context manager that prints one JSON trace line to stdout; P11 later adds the batch POST to M13) so every service emits traces from its first version.
 4. **Dockerfile pattern** (guide §4.4, adapted for the repo-root context):
    ```dockerfile
-   FROM python:3.12-slim AS build            # pin to a specific patch tag, e.g. python:3.12.8-slim
+   FROM python:3.12.16-slim AS build        # pinned patch tag (rule.md §12.2); newest 3.12 slim on Docker Hub in Nov 2026; re-check and bump deliberately, an old tag fails the Trivy CRITICAL gate
    WORKDIR /app
    COPY libs/contracts /contracts
    COPY services/verdict/requirements.txt .
    RUN pip install --no-cache-dir --prefix=/install -r requirements.txt /contracts
 
-   FROM python:3.12-slim
+   FROM python:3.12.16-slim
    RUN useradd -m app
    WORKDIR /app
    COPY --from=build /install /usr/local
@@ -57,8 +57,8 @@
    CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
    ```
    Build: `docker build -f services/verdict/Dockerfile -t localhost:5001/verdict:$sha .`
-5. **Build/push script** `scripts/build_push.ps1` (and `.sh` for Jenkins): for each `services/*` folder → `docker build` → tag with `$(git rev-parse --short HEAD)` → `docker push localhost:5001/<name>:<sha>`. **Never tag only `latest` [G].**
-6. **Kubernetes base manifests** in `k8s/base/` with a `kustomization.yaml` (deployed with `kubectl apply -k k8s/overlays/local`): one **Deployment + Service per module** (gateway, ui, orchestrator, scouts-as-CronJob later, tools, kb, analyst, ideation, validators, scorer, verdict, critic, agentops) using the guide's §9.2 pattern: `envFrom` ConfigMap, **liveness `/health` + readiness `/ready`**, `resources`, `runAsNonRoot`. Image = `k3d-idea-registry:5001/<name>:<sha>`.
+5. **Build/push script** `scripts/build_push.ps1` for your PC, and for Jenkins the LF shell scripts `scripts/build_all.sh <tag>` and `scripts/push_images.sh <tag>` (the names P10's Jenkinsfile calls): for each `services/*` folder → `docker build` → tag with `$(git rev-parse --short HEAD)` → `docker push localhost:5001/<name>:<sha>`. **Never tag only `latest` [G].**
+6. **Kubernetes base manifests** in `k8s/base/` with a `kustomization.yaml` (deployed with `kubectl apply -k k8s/overlays/local`): one **Deployment + Service per module** (gateway, ui, **profile (M2)**, orchestrator, **scouts (Deployment + Service for on-demand `POST /scout`; the CronJobs are added in P4)**, tools, kb, analyst, ideation, validators, scorer, verdict, critic, agentops) using the guide's §9.2 pattern: `envFrom` ConfigMap, **liveness `/health` + readiness `/ready`**, `resources`, `runAsNonRoot`. Image = `k3d-idea-registry:5001/<name>:<sha>`.
    Postgres / Redis / Qdrant as **StatefulSets with PVCs** (ready for P4/P6).
 7. **Ingress** (Traefik, shipped with k3s): `/` → `ui`, `/api` → `gateway`, using a StripPrefix middleware:
    ```yaml
@@ -95,7 +95,7 @@
          - run: pip install -r requirements-dev.txt
          - run: ruff check . && mypy services libs
          - run: pytest services/verdict libs/contracts -q
-         - run: pytest eval/retrieval -q        # retrieval gate (added in P6)
+         - run: pytest eval/retrieval -q || [ $? -eq 5 ]   # retrieval gate; exit 5 = no tests yet. REMOVE the '|| ...' guard in P6
      ui:
        runs-on: ubuntu-latest
        steps:
@@ -106,7 +106,7 @@
      docker:
        runs-on: ubuntu-latest
        strategy:
-         matrix: { service: [gateway, verdict, tools, kb, scorer, orchestrator] }   # extend to all
+         matrix: { service: [gateway, verdict, tools, kb, scorer, orchestrator] }   # extend to ALL service folders (brief M14: one image per module)
        steps:
          - uses: actions/checkout@v4
          - run: docker build -f services/${{ matrix.service }}/Dockerfile -t ${{ matrix.service }}:${{ github.sha }} .

@@ -28,22 +28,25 @@ uvicorn src.main:app --reload --port 8111      # local run; Swagger at http://lo
    gates: { min_sources: 3, min_platforms: 2, duplicate_diff_min: 3 }
    challenge: { penalty: 0.5, max_penalty: 1.0, conf_penalty: 0.1 }
    sensitivity: { weight_delta: 0.20, score_delta: 1.0 }
+   whatif: { step: 0.5 }                 # candidate grid for 'what would make this GO' (A10)
+   abstain: { max_abstained: 1 }         # more abstained dimensions than this -> INSUFFICIENT_EVIDENCE (A9)
    ```
 2. **Pure functions** (no I/O, no randomness, no LLM) in `src/engine.py`:
-   - `check_gates(scores, profile, evidence_stats, feasibility_estimate)` → first failing gate in order **Evidence → Feasibility → Risk → Duplicate**.
-   - `weighted_score(scores, weights)` = Σ(w·s) / 5 (weights sum 100).
-   - `confidence(scores, n_sources)` = 0.7·mean(conf) + 0.3·min(1, n_sources/5).
-   - `decide(...)` implements the flow in the brief (Fig. 4). **Floor check covers the first five dimensions only.**
+   - `check_gates(scores, profile, evidence_stats, feasibility_estimate)` → the first failing gate in order **Evidence → Feasibility → Risk → Duplicate**, **returned with its reason payload** (brief §5.2): Evidence → what is missing (e.g. `1 source / 1 platform`, goes to `missing_evidence`); Feasibility → the **hours gap** (`needed − available`); Risk → the **named blocker**; Duplicate → the **named product**.
+   - `weighted_score(scores, weights)` = Σ(w·s) / 5 (weights sum 100). **Abstained dimensions are excluded and the remaining weights rescaled to 100** (A9).
+   - `confidence(scores, n_sources)` = 0.7·mean(conf) + 0.3·min(1, n_sources/5); an abstained dimension counts as confidence 0 in the mean.
+   - `decide(...)` implements the flow in the brief (Fig. 4). **Floor check covers the first five dimensions only.** A floor breach gives PIVOT only if score ≥ T_no, otherwise NO-GO (A8). More than `abstain.max_abstained` abstained dimensions → INSUFFICIENT_EVIDENCE. PIVOT always sets `weakest_dimension` (for a floor breach, the breaching dimension). The sensitivity check runs **only for a GO** (Fig. 4).
    - `apply_challenge(scores, accepted_objections)` → −0.5 per accepted objection on the matching dimension (cap −1.0), confidence −0.1.
    - `sensitivity(...)`: for each of 6 weights ×{1.2, 0.8} rescale the *others* proportionally so the total stays 100 (`w_i * (100 − w_new)/(100 − w_old)`), plus the least-confident score ±1 clipped to [0,5] → **14 runs**; if any verdict differs → `BORDERLINE` and record which run flips it.
-   - `what_would_make_go(...)`: enumerate candidate single changes (raise one dimension in 0.5 steps up to 5; or reduce the hours gap), keep the **smallest change** that yields GO, and confirm it stays GO under the sensitivity runs; return `change`, `new_score`, `new_verdict`.
+   - `what_would_make_go(...)`: enumerate candidate single changes (raise one dimension on the `whatif.step` grid (0.5) up to 5; or reduce the hours gap), keep the **smallest change** that yields a **stable** GO (it must stay GO under the sensitivity runs); return `change`, `new_score`, `new_verdict`. The brief's "Competition 2.0 → 3.0" is an illustration, not necessarily the minimum (see A10).
 3. **Feasibility effort:** decide and record (decision record) how "estimated build effort" is compared with "available hours" (`hours_per_week × weeks_available × team_size` is our proposal, rule.md A2).
+   - Also record, as decision records or notes, **A8** (floor breach with score < T_no → NO-GO, as in Figure 4), **A9** (abstained dimension handling above) and **A10** (what-if grid and meaning of "smallest change").
 4. **Endpoints:** `POST /verdict`, `POST /whatif`, plus `/health`, `/ready` (config loaded), `/metrics`. Reload config on version change, and put the **config version, rubric version and weights version** in the response (`versions`).
-5. **Unit tests (required by the brief):** every gate (pass + fail), order of gates, each threshold **edge** (69.99 / 70.00, 49.99 / 50.00, floor 1.5 exactly), confidence formula and the 0.5 abstain edge, Learning exempt from floor, challenge cap, 14 sensitivity runs, BORDERLINE shows what flips, what-if finds the smallest change, **determinism** (same input twice → identical output), and the **worked example**:
+5. **Unit tests (required by the brief):** every gate (pass + fail, **each with its reason: hours gap / blocker / product / missing evidence**), order of gates, each threshold **edge** (69.99 / 70.00, 49.99 / 50.00, floor 1.5 exactly), confidence formula and the 0.5 abstain edge, Learning exempt from floor, challenge cap, 14 sensitivity runs, BORDERLINE shows what flips, what-if finds the smallest change, **determinism** (same input twice → identical output), **abstained-dimension handling (A9)**, **floor breach with score < T_no (A8)**, and the **worked example**:
    - Portfolio, scores 3.5/2.0/3.0/4.0/3.5/4.5 → **70.5 GO**
    - Feasibility weight 25 → 20 → **≈ 69.9 PIVOT** → card says GO, BORDERLINE
-   - Competition 2.0 → 3.0 → **73.5**, ≈ **73.1** under the same weights → stable GO
+   - Competition 2.0 → 3.0 → **73.5**, ≈ **73.1** under the same weights → stable GO. **Test this by recomputing with Competition = 3.0 directly.** Test `what_would_make_go` separately: it must return the smallest change on the 0.5 grid that gives a stable GO (this may be 2.5 → 72.0; that is also valid).
 6. **Rubrics** (`rubrics/<dimension>@vN.yaml`, one per dimension): anchors for each score 0–5, `features`, `output_schema`, at least one worked example per level (guide §10 template). Write all six now; M9/M10 use them in P7/P8.
-7. **Dockerfile + k8s:** build image, push, replace the stub's image; mount `config/verdict.yaml` via ConfigMap (Member 1 helps in P2 manifests).
+7. **Dockerfile + k8s:** build image, push, replace the stub's image; mount `config/verdict.yaml` via ConfigMap (Member 1 helps in P2 manifests). Generate the ConfigMap from `config/verdict.yaml` with a kustomize `configMapGenerator` so the file and the ConfigMap cannot drift (P12 edits only this file).
 
 **Done when also:** coverage of `engine.py` ≈ 100 % (this is the module the markers will poke).

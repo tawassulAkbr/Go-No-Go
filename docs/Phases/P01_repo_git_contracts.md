@@ -5,7 +5,7 @@
 
 
 **Goal:** a protected `main`, an agreed repo layout, and one definition of every JSON schema. **[B][G]**
-**Done when:** the first PR is merged with a review from the other member under protected `main`; contracts package imports in both PCs.
+**Done when:** the first PR is merged with a review from the other member under protected `main`; contracts package imports in both PCs. *(Branch protection is switched on only after the first CI run exists, i.e. at P2 steps 8–10; until then follow the PR + review rule by convention.)*
 
 ### P1-A: **Member 1**: repo, protection, hygiene
 1. **Create the repo (day 1).**
@@ -17,7 +17,7 @@
    ```
 2. **Layout [G]:**
    ```powershell
-   $dirs = "libs\contracts","services","jobs\ingestion","jobs\finetune","jobs\evaluation","rubrics","config","eval","k8s\base","k8s\overlays\local","docs\decisions","scripts",".github\workflows",".github\ISSUE_TEMPLATE"
+   $dirs = "libs\contracts","libs\tracing","libs\llm","services","jobs\ingestion","jobs\finetune","jobs\evaluation","rubrics","config","eval","k8s\base","k8s\overlays\local","docs\decisions","scripts",".github\workflows",".github\ISSUE_TEMPLATE"
    $dirs | ForEach-Object { New-Item -ItemType Directory -Force -Path $_ | Out-Null }
    ```
    Add a `.gitkeep` to empty folders.
@@ -32,11 +32,11 @@
 5. **`.env.example`** with names only: `DATABASE_URL=`, `REDIS_URL=`, `QDRANT_URL=`, `LLM_API_KEY=`, `GITHUB_TOKEN=`, `REDDIT_CLIENT_ID=`, `REDDIT_CLIENT_SECRET=`, `PRODUCTHUNT_TOKEN=`, `JWT_SECRET=`.
 6. **Templates:** `.github/pull_request_template.md` (what, why, how tested, AI used? Y/N + log entry, screenshots), issue template (task, acceptance criteria, module, phase).
 7. **Pre-commit** (`.pre-commit-config.yaml`) with `ruff`, `ruff-format`, `gitleaks`; run `pre-commit install` on **both** PCs.
-8. **Copy** `rule.md`, `phases.md`, `project_completion.md` into `docs/`; create empty `docs/ai-usage-log.md` (header: Date · Tool · Asked for · Changed · Why).
-9. **Protect `main`: do this AFTER the first CI run** (status check names must exist). Matrix jobs show up as `docker (<service>)`, so copy the **exact** names from the PR's checks list into `contexts` (one entry per matrix service). Save as `protection.json`:
+8. **Copy** `rule.md`, `phases/`, `project_completion.md` into `docs/`; create empty `docs/ai-usage-log.md` (header: Date · Tool · Asked for · Changed · Why).
+9. **Protect `main`: do this AFTER the first CI run** (status check names must exist). Matrix jobs show up as `docker (<service>)`, so copy the **exact** names from the PR's checks list into `contexts` (one entry per matrix service; add an entry whenever you add a service to the matrix). Save as `protection.json`:
    ```json
    {
-     "required_status_checks": { "strict": true, "contexts": ["test", "ui", "manifests", "secrets", "docker (gateway)", "docker (verdict)"] },
+     "required_status_checks": { "strict": true, "contexts": ["test", "ui", "manifests", "secrets", "docker (gateway)", "docker (verdict)", "docker (tools)", "docker (kb)", "docker (scorer)", "docker (orchestrator)"] },
      "enforce_admins": true,
      "required_pull_request_reviews": { "required_approving_review_count": 1 },
      "restrictions": null
@@ -51,7 +51,7 @@
 
 ### P1-B: **Member 2**: shared contracts (JSON schemas) [G §2]
 1. Create `libs/contracts` as an installable package (`pyproject.toml`, `src/contracts/`). Pydantic models, **one file per record**: `profile.py`, `card.py`, `evidence.py`, `scores.py` (DimensionScore), `verdict.py`, `trace.py`.
-2. Fields: use the guide's JSON examples (§2.1–2.3) as the **minimum**. Key points: `evidence_id` = `<card_id>#c<n>`; `DimensionScore.score` 0–5, `confidence` 0–1, `evidence_ids` list, `features` dict, `rubric_version`, `model`; `Verdict.verdict ∈ {GO,PIVOT,NO-GO,INSUFFICIENT_EVIDENCE}`, `stability ∈ {STABLE,BORDERLINE}`, `gates`, `weights`, `thresholds`, `sensitivity`, `versions`.
+2. Fields: use the guide's JSON examples (§2.1–2.3) as the **minimum**. Key points: `evidence_id` = `<card_id>#c<n>`; `DimensionScore.score` 0–5, `confidence` 0–1, `evidence_ids` list, `features` dict, `rubric_version`, `model`; `Verdict.verdict ∈ {GO,PIVOT,NO-GO,INSUFFICIENT_EVIDENCE}`, `stability ∈ {STABLE,BORDERLINE}`, `gates` (each gate = `{status: pass|fail, reason: str, detail: {...}}` so the card can state the **hours gap**, the **named blocker** and the **named duplicate product**), `missing_evidence: list[str]` (what an INSUFFICIENT_EVIDENCE card shows, U10), `weakest_dimension`, `weights`, `thresholds`, `sensitivity` (`runs`, `flipped`, `flips: [{run, change, verdict}]`), `versions`. An abstained `DimensionScore` has `abstained=true`, `score=0`, `confidence=0`; M11 must never treat it as a real 0 (see P3, A9).
    ```python
    # libs/contracts/src/contracts/scores.py  (sketch)
    from pydantic import BaseModel, Field, model_validator
@@ -76,6 +76,6 @@
 3. Export JSON Schema: `python -m contracts.export schemas/` writes `libs/contracts/schemas/*.json`; commit them.
 4. Tests: valid/invalid examples for each model (including the "no evidence → must abstain" rule).
 5. Install on your PC: `py -3.12 -m venv .venv; .\.venv\Scripts\Activate.ps1; pip install -e libs/contracts pytest; pytest libs/contracts`.
-6. Write `docs/api.md`: the endpoint table from Guide §3 (public M1 + internal M5, M6, M10, M11, M12, M13). This is the contract both members code against.
+6. Write `docs/api.md`: the endpoint table from Guide §3 (public M1 + internal M5 (`/fetch` **and `/llm`**), M4 `/scout`, M6, M10, M11, M12, M13). This is the contract both members code against.
 
 **Important Docker note [T]:** images are built with the **repo root as build context** (`docker build -f services/x/Dockerfile .`) so every image can `COPY libs/contracts`.

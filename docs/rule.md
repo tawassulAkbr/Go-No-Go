@@ -21,7 +21,7 @@ Keywords: **MUST** / **MUST NOT** are non-negotiable. **SHOULD** is the default 
 
 1. Group of **2** students. **Both** members commit code, review each other's pull requests, and must be able to explain the **whole** system, not only their own modules. **[B]**
 2. The contribution table is **signed by both members** and **must match the git history**. So neither member may do all the commits, and no work may be committed under the other person's name. **[B]**
-3. Each member owns the modules assigned in `phases.md`, but every module needs the other member as reviewer. **[T]**
+3. Each member owns the modules assigned in `phases/`, but every module needs the other member as reviewer. **[T]**
 4. One issue per task, linked to its pull request. Small branches with one purpose. **[G]**
 5. Before the final submission, each member walks the other through every module (30 minutes each). Anything the other can't explain is rewritten or documented. **[T]**
 
@@ -52,7 +52,7 @@ Keywords: **MUST** / **MUST NOT** are non-negotiable. **SHOULD** is the default 
 3. The kubeconfig used by Jenkins is a **Jenkins credential**, never in the repository. **[G]**
 4. If a secret is ever committed: rotate it first, then clean history. Deleting the file in a later commit is not enough. **[T]**
 5. Add secret scanning to the PR checks (for example `gitleaks`). **[T]**
-6. Passwords are stored as hashes (never plain text). Login and sign-up are rate-limited and all input is validated. **[B]**
+6. Login, rate limits and input validation are required **[B]**; passwords are stored as hashes, never plain text **[G]** (the guide's `users.hash`).
 7. Containers run as **non-root**. **[G]**
 
 ## 5. Architecture hard rules
@@ -95,8 +95,8 @@ Keywords: **MUST** / **MUST NOT** are non-negotiable. **SHOULD** is the default 
 
 5. **Thresholds** (starting values, tunable): `T_go = 70`, `T_no = 50`, `floor = 1.5`. **[B]**
    - GO: score ≥ T_go **and** no score below the floor on the **first five** dimensions (Learning is exempt).
-   - PIVOT: T_no ≤ score < T_go, **or** a floor breach. It names the weakest dimension.
-   - NO-GO: score < T_no.
+   - PIVOT: T_no ≤ score < T_go, **or** a floor breach when score ≥ T_no (A8). It names the weakest dimension (for a breach, the breaching one).
+   - NO-GO: score < T_no, including when a floor is also breached (A8, as in Figure 4).
 6. **Confidence** = `0.7 × mean(dimension confidence) + 0.3 × min(1, sources / 5)`. Below **0.5** → INSUFFICIENT EVIDENCE (the system abstains instead of guessing). **[B]**
 7. **Challenge:** each objection the critic accepts as evidence-backed lowers the matching score by **0.5** (at most **1.0**) and its confidence by **0.1**. Unsupported objections are discarded. **[B]**
 8. **Sensitivity:** recompute with each weight moved ±20 % (the difference shared among the others) and the least-confident score moved ±1. If any run changes the verdict, the card says **BORDERLINE** and shows what flips it. (6 weights × 2 + 2 = **14 runs**, matching the guide's example.) **[B][G]**
@@ -172,7 +172,7 @@ Keywords: **MUST** / **MUST NOT** are non-negotiable. **SHOULD** is the default 
 ## 13. Kubernetes rules
 
 1. Namespace **`idea-validator`**. **[G]**
-2. Deployments + Services for M1, M3, M5, M6, M7, M8, M9, M10, M11, M12, M13. StatefulSet/PVC for Postgres, Redis (if persistent), vector store. **CronJobs** for scouts and ingestion; a **Job** for evaluation. ConfigMaps (weights, thresholds, floors, rubric versions, budgets) and Secrets (API keys, DB password). **[B][G]**
+2. Deployments + Services for M1–M13 (the guide's list omits M2 and M4, but both need a Service; M4 also has CronJobs). StatefulSet/PVC for Postgres, Redis (if persistent), vector store. **CronJobs** for scouts and ingestion; a **Job** for evaluation. ConfigMaps (weights, thresholds, floors, rubric versions, budgets) and Secrets (API keys, DB password). **[B][G]**
 3. **Liveness + readiness probes**, **requests and limits** (taken from `kubectl top` measurements, and say so in the report), **non-root**, **pinned image** on **every** workload. **[G]**
 4. **Autoscaler** on the API gateway. **[G]**
 5. **Rolling update** with `maxUnavailable: 0`; demonstrate **`kubectl rollout undo`** on a bad release. **[G]**
@@ -215,7 +215,7 @@ lint + type checks · unit tests (incl. Verdict Engine) · component tests (UI) 
 
 1. Windows 10 22H2 or Windows 11; **virtualization enabled** in BIOS/UEFI; **WSL 2** + **Docker Desktop (WSL 2 backend)**.
 2. **Do not** enable Docker Desktop's built-in Kubernetes. We use **k3d** (k3s in Docker) because it enforces NetworkPolicy.
-3. Cap WSL memory in `%UserProfile%\.wslconfig` so the laptop stays usable (see `phases.md` P0).
+3. Cap WSL memory in `%UserProfile%\.wslconfig` so the laptop stays usable (see `phases/` P0).
 4. Keep the repo in a **short path** (`C:\dev\idea-validator`) and run `git config --global core.longpaths true`.
 5. **Line endings:** commit `.gitattributes` with `* text=auto eol=lf` (and `*.ps1 text eol=crlf`). Shell scripts with CRLF break inside Linux containers (`bad interpreter`).
 6. Shell scripts (`*.sh`) run **inside Linux containers / Jenkins**. On Windows, run them from Git Bash or WSL. PowerShell equivalents live next to them when a member needs one.
@@ -256,3 +256,6 @@ Submit through **GCR** with: **[B]**
 | A5 | "Weights ±20 %": relative (25 → 20) or absolute points? | _Brief's example is relative (25 → 20); use relative._ | |
 | A6 | Which third data source(s) and which vector store | _Proposed: Hacker News + GitHub + Product Hunt (+ Reddit only if its current API terms allow); Qdrant._ | |
 | A7 | Agents need a hosted LLM, but "only M5 reaches the internet" | _Proposed: route all LLM calls through an M5 connector (`POST /llm`), so M5 holds the key and counts tokens/cost._ | |
+| A8 | Floor breach with score < T_no: PIVOT (text §5.3) or NO-GO (Figure 4)? | _Proposed: follow Figure 4: PIVOT only if score ≥ T_no, otherwise NO-GO._ | |
+| A9 | A scorer abstains: how does M11 treat that dimension? | _Proposed: exclude it from the weighted sum and rescale the other weights to 100; count it as confidence 0; more than `abstain.max_abstained` (1) abstained dimensions → INSUFFICIENT_EVIDENCE._ | |
+| A10 | "Smallest change" in what-if vs the brief's example (Competition 2.0 → 3.0) | _Proposed: search a 0.5 grid and return the smallest change that gives a stable GO; the brief's example is an illustration, tested by direct recomputation._ | |

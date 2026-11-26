@@ -18,7 +18,7 @@ pip install torch --index-url https://download.pytorch.org/whl/cpu ; pip install
 cd ..\analyst ; py -3.12 -m venv .venv ; .\.venv\Scripts\Activate.ps1
 pip install fastapi uvicorn[standard] scikit-learn pandas numpy qdrant-client pytest
 ```
-Models download on first run (~100–400 MB). **Cache them into the image at build time** so pods don't need internet (the NetworkPolicy blocks it): `RUN python -c "from fastembed import TextEmbedding; TextEmbedding('BAAI/bge-small-en-v1.5')"` in the Dockerfile **build** stage and copy the cache dir.
+Models download on first run (~100–400 MB). **Cache them into the image at build time** so pods don't need internet (the NetworkPolicy blocks it): `RUN python -c "from fastembed import TextEmbedding; from fastembed.rerank.cross_encoder import TextCrossEncoder; TextEmbedding('BAAI/bge-small-en-v1.5'); TextCrossEncoder('Xenova/ms-marco-MiniLM-L-6-v2')"` in the Dockerfile **build** stage and copy the cache dir. **Bake the cross-encoder reranker too, not only the embedder** (check the model name with `TextCrossEncoder.list_supported_models()`).
 
 ### 6A. M6: Knowledge Base (`services/kb`)
 1. `POST /search` `{query, k, filters:{source, niche, date_from, date_to}}` → ranked **evidence items** (guide §2.2): `evidence_id` (`card_x#cN`), `card_id`, `quote`, `source`, `url`, `retrieved_at`, `score`.
@@ -27,7 +27,7 @@ Models download on first run (~100–400 MB). **Cache them into the image at bui
 4. **Card ids always preserved** (chunk id → card id → URL).
 5. **Cache** retrieval in Redis with `kb_version` in the key (via M2's cache helpers).
 6. **Retrieval evaluation [B][G]:** `eval/retrieval/queries.jsonl` = **≥ 20 hand-written queries**, each with the card ids a human judged relevant (both members write ~10 each). Script `eval/retrieval/run.py` computes **recall@5, MRR, nDCG@10** for: vector only · keyword only · hybrid · hybrid + rerank. Save `eval/retrieval/baseline.json`.
-7. **PR gate:** `eval/retrieval/test_gate.py` fails if recall@5 or MRR falls below `baseline.json − tolerance`. In CI it builds a tiny index from `data/snapshot/cards.jsonl.gz` using Qdrant in-memory mode (`QdrantClient(":memory:")`), so no services are needed in GitHub Actions.
+7. **PR gate** (also remove the temporary `|| [ $? -eq 5 ]` guard from the retrieval step of the P2 workflow): `eval/retrieval/test_gate.py` fails if recall@5 or MRR falls below `baseline.json − tolerance`. In CI it builds a tiny index from `data/snapshot/cards.jsonl.gz` using Qdrant in-memory mode (`QdrantClient(":memory:")`), so no services are needed in GitHub Actions.
 8. **Decision record #1** (use the numbers from step 6): *Use hybrid search with reranking* (guide §11.1 template).
 
 ### 6B. M7: Niche & Trend Analyst (`services/analyst`)

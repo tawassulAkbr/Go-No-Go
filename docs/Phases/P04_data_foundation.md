@@ -31,13 +31,13 @@ Load secrets into the cluster later with (PowerShell): `kubectl create secret ge
 
 ### 4A. M2: Profile, Session, Cache (`services/profile`)
 1. **Layers [B]:** `routes/` (HTTP only) → `services/` (business rules) → `repositories/` (SQL only). No SQL in routes.
-2. **Alembic migrations [B]:** `alembic init`, then create tables from the guide's data model (§2): `users`, `profiles`, `ideas`, `idea_versions`, `verdicts`, `dimension_scores`, `conversations`, `approvals`, `traces_index`, `cards`, `card_sources`, `niches`, `niche_stats`, `ingestion_runs`. Add `profiles.version` (integer, incremented on every change).
+2. **Alembic migrations [B]:** `alembic init`, then create tables from the guide's data model (§2): `users`, `profiles`, `ideas`, `idea_versions`, `verdicts`, `dimension_scores`, `conversations`, `approvals`, `traces_index`, `runs`, `cards`, `card_sources`, `niches`, `niche_stats`, `ingestion_runs`. Add `profiles.version` (integer, incremented on every change). `runs` (brief M2: "users, profiles, ideas, versions and **runs**") holds `run_id, user_id, idea_id, mode (discover|validate), state, state_json, budget_json, created_at, updated_at`; M3 persists waiting runs here (P7). `verdicts` stores the `versions` object plus `gates`/`missing_evidence` as JSONB; `dimension_scores` stores `abstained`, `features`, `rubric_version`, `model`.
    ```powershell
    cd services\profile ; alembic revision --autogenerate -m "initial" ; alembic upgrade head
    ```
    On Kubernetes run `alembic upgrade head` as an **initContainer or Job**.
 3. **Redis cache [B]:** keys **must** include versions, e.g.
-   `verdict:{idea_hash}:{profile_version}:{rubric_version}:{engine_version}` and `retrieve:{query_hash}:{filters_hash}:{kb_version}`; TTL on all. Return a `cache_hit` flag (response header `X-Cache: HIT|MISS` and the trace record's `cache_hit`) so hits are **visible**.
+   `verdict:{idea_hash}:{profile_version}:{rubric_version}:{engine_version}` and `retrieve:{query_hash}:{filters_hash}:{kb_version}` (retrieval does not depend on profile or rubric, so those versions are deliberately absent: say so in a decision record or the report); TTL on all. Return a `cache_hit` flag (response header `X-Cache: HIT|MISS` and the trace record's `cache_hit`) so hits are **visible**.
 4. **Endpoints** for M1/M3 (document in `docs/api.md`): users, profile (GET/PUT), ideas, versions, verdicts, history, compare data, approvals; `/health`, `/ready` (DB + Redis reachable), `/metrics`.
 5. **Tests:** repository tests with a throwaway DB; "profile change bumps version and invalidates old cache key"; "stored password is a hash".
 
@@ -56,7 +56,7 @@ Load secrets into the cluster later with (PowerShell): `kubectl create secret ge
 3. Two run modes: **CLI for CronJobs** (`python -m scouts --source hn --limit 500`) and **on-demand** `POST /scout {source, query, run_id}` for the orchestrator.
 4. Failure handling: per-source rate limit, retry with back-off, partial results kept, errors recorded in `ingestion_runs` and the trace.
 5. Store raw items (`raw_items` table or `data/raw/*.jsonl`, git-ignored) → hand to M6i.
-6. **CronJobs** (`k8s/base/cron-scout-<source>.yaml`, from guide §9.2): `schedule: "0 */6 * * *"`, `restartPolicy: OnFailure`. **Trigger one manually:**
+6. **CronJobs** (`k8s/base/cron-scout-<source>.yaml`, from guide §9.2). The same `scouts` image also runs as the Deployment + Service created in P2 for on-demand `POST /scout`; the CronJobs run `python -m scouts --source ...`: `schedule: "0 */6 * * *"`, `restartPolicy: OnFailure`. **Trigger one manually:**
    `kubectl create job --from=cronjob/scout-hn scout-hn-manual -n idea-validator` then `kubectl logs job/scout-hn-manual -n idea-validator`.
 
 ### 4D. M6i: Ingestion job (`jobs/ingestion`)

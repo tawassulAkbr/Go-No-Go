@@ -20,7 +20,8 @@ wsl --status
 Limit WSL memory so Docker doesn't swallow the PC. Create `%UserProfile%\.wslconfig`:
 ```ini
 [wsl2]
-memory=8GB        ; use 6GB on an 8–12 GB machine
+# use memory=6GB on an 8–12 GB machine (keep comments on their own line)
+memory=8GB
 processors=4
 swap=4GB
 ```

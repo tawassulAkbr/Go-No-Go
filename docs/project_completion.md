@@ -1,7 +1,7 @@
 # project_completion.md — Master Plan and Completion Checklist
 
 **Project:** CS4032 Semester Project — *Idea Generator with Go / No-Go* (group of 2)
-**Companion files:** `phases.md` (what each member builds, with Windows setup) · `rule.md` (rules and limits)
+**Companion files:** `phases/` (what each member builds, with Windows setup) · `rule.md` (rules and limits)
 **Tags:** **[B]** = project description · **[G]** = guide · **[T]** = our own suggestion
 
 > The PDFs give **no deadline**. The timeline below assumes about 10 weeks. Replace the weeks with your real dates.
@@ -42,7 +42,7 @@ The same idea can get different verdicts for different students (200 free hours 
 
 ## 3. Module checklist (M1–M14) [B]
 
-Owner: **P1** = Member 1 (Data & Platform), **P2** = Member 2 (Product & Intelligence). Phase numbers refer to `phases.md`.
+Owner: **P1** = Member 1 (Data & Platform), **P2** = Member 2 (Product & Intelligence). Phase numbers refer to `phases/`.
 
 | Module | What it is | "Must have" from the brief | Owner | Phase | ☐ |
 |---|---|---|---|---|---|
@@ -84,6 +84,7 @@ idea + profile + six scored dimensions
 - **Challenge:** each critic-accepted objection → matching score −0.5 (max −1.0), confidence −0.1.
 - **Sensitivity:** 6 weights × (+20 %, −20 %) + least-confident score ±1 = **14 runs**; any flip → BORDERLINE.
 - **What-if:** smallest change that flips the verdict; applying it creates version 2 (scorers + engine re-run).
+- **Edge rules (rule.md §19):** floor breach with score < T_no → NO-GO (A8); abstained dimension excluded and weights rescaled (A9); what-if returns the smallest stable-GO change on a 0.5 grid (A10).
 
 **Worked example from the brief (must be a unit test):** Portfolio weights 15/15/15/25/10/20; scores 3.5, 2.0, 3.0, 4.0, 3.5, 4.5 → sum 352.5 ÷ 5 = **70.5 → GO**. Feasibility weight 25 → 20 (freed 5 shared proportionally) → **≈ 69.9 → PIVOT**, so the card says **GO, BORDERLINE**. Raising Competition 2.0 → 3.0 gives **73.5** (≈ **73.1** under the same weight change) → stable GO. *(I re-computed these numbers: they check out.)*
 
@@ -142,7 +143,7 @@ idea + profile + six scored dimensions
 | Docker images | ≥ 6 distinct |
 | Decision records | ≥ 3 |
 | Debate rounds | ≤ 3 |
-| Labelled verdict set | Our own; clear GOs, NO-GOs, borderline, thin-evidence (suggest ≥ 30 ideas [T]) |
+| Labelled verdict set | Our own; clear GOs, NO-GOs, borderline, thin-evidence (suggest ≥ 50, never < 30 [T]) |
 | Report length | ≤ 10 pages |
 
 ---
@@ -152,10 +153,10 @@ idea + profile + six scored dimensions
 | Week | Both | Member 1 (Data & Platform) | Member 2 (Product & Intelligence) |
 |---|---|---|---|
 | 1 | **P0** Windows setup · **P1** repo, protection, contracts | repo + protection + CI skeleton | schemas / contracts, issue plan |
-| 2 | | **P2** k3d, registry, compose, Docker pattern, **thin slice of all modules on K8s** | **P3** Verdict Engine (pure code + unit tests) |
+| 2 | | **P2** k3d, registry, compose, Docker pattern, **thin slice of all modules on K8s** (incl. `profile`, `scouts`, `libs/tracing` stub) | **P3** Verdict Engine (pure code + unit tests) |
 | 3 | | **P4** M2, M5, M4, M6i → first cards | **P5** M1 gateway + UI + auth |
 | 4 | | P4 continues → **1,500 cards, 3 sources** | P5 continues (live progress, verdict card) |
-| 5 | | **P6** M6 hybrid search, 20-query eval, M7 | **P7** M3 + M9 + M12 (Validate end-to-end with hosted LLM) |
+| 5 | Reserve labelled-idea ids (`eval/labelled/ids.txt`) | **P6** M6 hybrid search, 20-query eval, M7 | **P7** M3 + M9 + M12 (Validate end-to-end with hosted LLM) |
 | 6 | | P6 continues | P7 continues |
 | 7 | | **P10** Jenkins, NetworkPolicy, HPA, probes, limits | **P8** fine-tune dataset → Colab training → serve M10 |
 | 8 | | **P11** M13 AgenticOps | **P9** M8 Discover + debate loop, challenge, what-if, compare |

@@ -25,7 +25,7 @@ uvicorn src.main:app --reload --port 8101
 ### 5A. Gateway API (`services/gateway`) is the public endpoints in Guide §3
 `POST /auth/register|login`, `GET|PUT /profile`, `POST /discover|/validate`, `GET /runs/{id}`, `GET /runs/{id}/events` (**SSE**), `POST /runs/{id}/answer|/approve`, `POST /ideas/{id}/challenge|/whatif`, `GET /ideas`, `/ideas/{id}/versions`, `/compare`, `GET /metrics`, `/health`, `/ready`.
 1. **Login [B]:** passwords hashed (argon2/bcrypt), JWT with expiry, auth dependency on every route except register/login/health.
-2. **Rate limits [B]:** per-IP and per-user (`slowapi` or Redis token bucket), stricter on `/auth/*` and run-starting routes. Return 429 with `Retry-After`.
+2. **Rate limits [B]:** per-IP and per-user (`slowapi` with a Redis `storage_uri`, or a Redis token bucket; an in-memory counter breaks when the HPA runs several gateway replicas), stricter on `/auth/*` and run-starting routes. Return 429 with `Retry-After`.
 3. **Input validation [B]:** Pydantic models for every body; max lengths; reject unknown fields.
 4. **Live progress (U3):** `/runs/{id}/events` streams trace-like events (`agent_started`, `tool_call`, `llm_call`, `cost_update`, `needs_answer`, `needs_approval`, `done`) read from a Redis stream written by M3. Reconnect with `Last-Event-ID`.
 5. **No direct calls from the browser to models or scouts [G]:** the gateway is the only thing the UI talks to.

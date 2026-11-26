@@ -21,7 +21,7 @@ pip install pandas scikit-learn jsonschema httpx pytest
 1. **Collect ≥ 300 (idea, evidence, dimension) examples** from the KB, covering **all 6 dimensions and all score levels 0–5** [B]. Aim for ~450 raw so ≥ 300 survive filtering. Include hard cases (thin evidence → low confidence/abstain, contradictory evidence).
 2. **Draft labels with a hosted model** using the same rubric files (`rubrics/*.yaml`), JSON output only.
 3. **Hand-check ≥ 60** and correct them; mark `"checked": true, "checked_by": "m1|m2"`. Split the checking between both members; these form the **evaluation set** [G].
-4. **Split by idea, not row** (80/20, fixed seed): `train.jsonl`, `test.jsonl`, plus `manifest.json` listing idea ids per split. **Never use ideas from the labelled verdict set (P12)** → `scripts/check_leakage.py` fails if ids overlap.
+4. **Split by idea, not row** (80/20, fixed seed): `train.jsonl`, `test.jsonl`, plus `manifest.json` listing idea ids per split. **Never use ideas from the labelled verdict set (P12)** → `scripts/check_leakage.py` fails if ids overlap. **The labelled ids must exist before this dataset is built:** both members pick the labelled ideas in week 5 and commit `eval/labelled/ids.txt` (labels come later in P12); the training split excludes those ids.
 5. **Format (one JSON object per line) [G §6.1]:**
    ```json
    {"messages":[

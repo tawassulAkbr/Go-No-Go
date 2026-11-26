@@ -40,19 +40,20 @@
 ```groovy
 pipeline {
   agent any
-  options { timestamps() }
+  options { timestamps(); skipDefaultCheckout(true) }   // TAG is set after our explicit Checkout stage
   triggers { pollSCM('H/2 * * * *'); cron('H 2 * * *') }
   environment {
-    TAG = "${env.GIT_COMMIT.take(7)}"
     PUSH_REG = "localhost:5001"              // used by the docker daemon on the host
     CLUSTER_REG = "k3d-idea-registry:5001"   // used by the cluster
     NS = "idea-validator"
   }
   stages {
     // Unit tests already ran as required checks in GitHub Actions before merge; Jenkins focuses on delivery.
-    stage('Build')  { steps { sh './scripts/build_all.sh $TAG' } }               // docker build per service, tagged by SHA
-    stage('Push')   { steps { sh './scripts/push_images.sh $TAG' } }
+    stage('Checkout') { steps { checkout scm; script { env.TAG = sh(returnStdout: true, script: 'git rev-parse --short=7 HEAD').trim() } } }
+    stage('Build')  { when { not { triggeredBy 'TimerTrigger' } } steps { sh './scripts/build_all.sh $TAG' } }               // docker build per service, tagged by SHA
+    stage('Push')   { when { not { triggeredBy 'TimerTrigger' } } steps { sh './scripts/push_images.sh $TAG' } }
     stage('Deploy') {
+      when { not { triggeredBy 'TimerTrigger' } }
       steps { withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
         sh './scripts/deploy.sh $TAG'          // kubectl set image deploy/<svc> <svc>=$CLUSTER_REG/<svc>:$TAG ; kubectl rollout status
       } }
@@ -75,7 +76,7 @@ pipeline {
   }
 }
 ```
-**Rule [G]:** a failing stage stops the pipeline, so nothing later (deploy) runs. Make the shell scripts LF (`.gitattributes`), executable (`git update-index --chmod=+x scripts/*.sh`) and have them use `set -euo pipefail`.
+**Stages = the guide's list:** Checkout → Build (tag by SHA) → Push → Deploy → Smoke → (nightly) Eval. A timer (nightly) run skips Build/Push/Deploy and evaluates what is already deployed. **Rule [G]:** a failing stage stops the pipeline, so nothing later (deploy) runs. Make the shell scripts LF (`.gitattributes`), executable (`git update-index --chmod=+x scripts/*.sh`) and have them use `set -euo pipefail`.
 **Screenshots:** one **green** and one **failing** Jenkins run (break `smoke_test.sh` on a branch on purpose, then fix).
 
 ### 10C. NetworkPolicy: only M5 reaches the internet [B][G §9.3]
