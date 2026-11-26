@@ -1,7 +1,7 @@
 # P6. Knowledge base (RAG) and niche analyst: **Member 1** (M6, M7)
 
 > **Owner:** Member 1  
-> Part of the CS4032 *Idea Generator with Go / No-Go* project. Rules: `../rule.md` · Checklist: `../project_completion.md` · Index: `../README.md`
+> Part of the CS4032 *Idea Generator with Go / No-Go* project. [Rules](../rule.md) · [Checklist](../project_completion.md) · [Project index](../../README.md)
 
 
 **Goal:** trustworthy retrieval with citations + niches/trends/gaps. **[B]**

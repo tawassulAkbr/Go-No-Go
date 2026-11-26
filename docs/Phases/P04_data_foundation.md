@@ -1,7 +1,7 @@
 # P4. Data foundation: DB/cache, tool layer, scouts, ingestion: **Member 1** (M2, M5, M4, M6i)
 
 > **Owner:** Member 1  
-> Part of the CS4032 *Idea Generator with Go / No-Go* project. Rules: `../rule.md` · Checklist: `../project_completion.md` · Index: `../README.md`
+> Part of the CS4032 *Idea Generator with Go / No-Go* project. [Rules](../rule.md) · [Checklist](../project_completion.md) · [Project index](../../README.md)
 
 
 **Goal:** real data flows in through the *only* internet exit (M5) and ends as **≥ 1,500 idea cards from ≥ 3 sources**, stored in Postgres + the vector store, plus the profile/session/cache service. **[B]**

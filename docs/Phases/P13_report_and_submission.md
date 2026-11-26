@@ -1,7 +1,7 @@
 # P13. Report, screenshots, submission: **Both members**
 
 > **Owner:** Both members  
-> Part of the CS4032 *Idea Generator with Go / No-Go* project. Rules: `../rule.md` · Checklist: `../project_completion.md` · Index: `../README.md`
+> Part of the CS4032 *Idea Generator with Go / No-Go* project. [Rules](../rule.md) · [Checklist](../project_completion.md) · [Project index](../../README.md)
 
 
 **Done when:** a fresh clone starts from the README alone, the report PDF is ≤ 10 pages, every checklist item in `project_completion.md §5` is ticked, and both members have signed.

@@ -1,7 +1,7 @@
 # P12. Labelling, tuning and evaluation: **Both members**
 
 > **Owner:** Both members  
-> Part of the CS4032 *Idea Generator with Go / No-Go* project. Rules: `../rule.md` · Checklist: `../project_completion.md` · Index: `../README.md`
+> Part of the CS4032 *Idea Generator with Go / No-Go* project. [Rules](../rule.md) · [Checklist](../project_completion.md) · [Project index](../../README.md)
 
 
 **Goal:** thresholds and weights that agree with humans, with honest before/after numbers. **[G §10]**
