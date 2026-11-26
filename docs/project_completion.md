@@ -1,7 +1,23 @@
 # project_completion.md — Master Plan and Completion Checklist
 
 **Project:** CS4032 Semester Project — *Idea Generator with Go / No-Go* (group of 2)
-**Companion files:** `phases/` (what each member builds, with Windows setup) · `rule.md` (rules and limits)
+**Companion files:** [phase plans](Phases/) (what each member builds, with Windows setup) · [rules](rule.md) (rules and limits)
+
+**Phase 0 workstation sign-off** (team reports completion on 2026-11-26) ([setup and checker](Phases/P00_windows_setup.md))
+
+- [ ] Independently verify Member 1’s Docker smoke test and checker output (exit 0).
+- [ ] Independently verify Member 2’s Docker smoke test and checker output (exit 0).
+
+**Phase 1 verification against the [brief](Project.pdf) and [guide](Project_Guide.pdf)**
+
+| Requirement | Evidence as of 2026-11-26 |
+|---|---|
+| Guide §§2–3, six shared records and service interfaces | [Contracts, schemas and tests](../libs/contracts/) cover the six records. The [API table](api.md) covers the gateway and internal services. |
+| Guide §§4.1–4.3, repository and local setup | Directory layout, environment template, line-ending rules, review templates and pre-commit hooks are present. Verify package imports and hook installation on each member’s PC. |
+| Guide §4.2, task tracking and peer review | GitHub showed both members with push access, zero milestones, zero issues and zero PRs at audit time. Assigned tasks and a teammate-reviewed PR remain open. |
+| Brief M14 and Guide §8, protected main and required CI | Scheduled for P2 after the first green required checks. Capture protection and review evidence then. |
+
+
 **Tags:** **[B]** = project description · **[G]** = guide · **[T]** = our own suggestion
 
 > The PDFs give **no deadline**. The timeline below assumes about 10 weeks. Replace the weeks with your real dates.
@@ -42,7 +58,7 @@ The same idea can get different verdicts for different students (200 free hours 
 
 ## 3. Module checklist (M1–M14) [B]
 
-Owner: **P1** = Member 1 (Data & Platform), **P2** = Member 2 (Product & Intelligence). Phase numbers refer to `phases/`.
+Owner: **P1** = Member 1 (Data & Platform), **P2** = Member 2 (Product & Intelligence). Phase numbers refer to [phase plans](Phases/).
 
 | Module | What it is | "Must have" from the brief | Owner | Phase | ☐ |
 |---|---|---|---|---|---|
@@ -152,8 +168,8 @@ idea + profile + six scored dimensions
 
 | Week | Both | Member 1 (Data & Platform) | Member 2 (Product & Intelligence) |
 |---|---|---|---|
-| 1 | **P0** Windows setup · **P1** repo, protection, contracts | repo + protection + CI skeleton | schemas / contracts, issue plan |
-| 2 | | **P2** k3d, registry, compose, Docker pattern, **thin slice of all modules on K8s** (incl. `profile`, `scouts`, `libs/tracing` stub) | **P3** Verdict Engine (pure code + unit tests) |
+| 1 | **P0** Windows setup · **P1** repo, reviews, contracts | repo + protection plan + CI skeleton | schemas / contracts, issue plan |
+| 2 | | **P2** required checks, branch protection, Jenkins smoke run, k3d, registry, compose, Docker pattern, **thin slice of all modules on K8s** (incl. `profile`, `scouts`, `libs/tracing` stub) | **P3** Verdict Engine (pure code + unit tests) |
 | 3 | | **P4** M2, M5, M4, M6i → first cards | **P5** M1 gateway + UI + auth |
 | 4 | | P4 continues → **1,500 cards, 3 sources** | P5 continues (live progress, verdict card) |
 | 5 | Reserve labelled-idea ids (`eval/labelled/ids.txt`) | **P6** M6 hybrid search, 20-query eval, M7 | **P7** M3 + M9 + M12 (Validate end-to-end with hosted LLM) |
