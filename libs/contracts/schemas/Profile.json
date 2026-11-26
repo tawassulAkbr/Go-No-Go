@@ -1,0 +1,71 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "user_id": {
+      "minLength": 1,
+      "title": "User Id",
+      "type": "string"
+    },
+    "skills": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Skills",
+      "type": "array"
+    },
+    "hours_per_week": {
+      "exclusiveMinimum": 0,
+      "title": "Hours Per Week",
+      "type": "integer"
+    },
+    "weeks_available": {
+      "exclusiveMinimum": 0,
+      "title": "Weeks Available",
+      "type": "integer"
+    },
+    "team_size": {
+      "exclusiveMinimum": 0,
+      "title": "Team Size",
+      "type": "integer"
+    },
+    "compute": {
+      "enum": [
+        "laptop",
+        "free_gpu",
+        "paid"
+      ],
+      "title": "Compute",
+      "type": "string"
+    },
+    "goal": {
+      "enum": [
+        "startup",
+        "portfolio",
+        "course_project"
+      ],
+      "title": "Goal",
+      "type": "string"
+    },
+    "interests": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Interests",
+      "type": "array"
+    }
+  },
+  "required": [
+    "user_id",
+    "skills",
+    "hours_per_week",
+    "weeks_available",
+    "team_size",
+    "compute",
+    "goal",
+    "interests"
+  ],
+  "title": "Profile",
+  "type": "object"
+}

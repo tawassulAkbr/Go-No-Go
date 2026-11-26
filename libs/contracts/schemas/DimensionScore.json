@@ -1,0 +1,104 @@
+{
+  "additionalProperties": false,
+  "else": {
+    "properties": {
+      "evidence_ids": {
+        "minItems": 1
+      }
+    },
+    "required": [
+      "evidence_ids"
+    ]
+  },
+  "if": {
+    "properties": {
+      "abstained": {
+        "const": true
+      }
+    },
+    "required": [
+      "abstained"
+    ]
+  },
+  "properties": {
+    "dimension": {
+      "enum": [
+        "demand_pain",
+        "competition",
+        "differentiation",
+        "feasibility",
+        "risk",
+        "learning"
+      ],
+      "title": "Dimension",
+      "type": "string"
+    },
+    "score": {
+      "maximum": 5,
+      "minimum": 0,
+      "title": "Score",
+      "type": "number"
+    },
+    "confidence": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "evidence_ids": {
+      "items": {
+        "pattern": "^[^#\\s]+#c[0-9]+$",
+        "type": "string"
+      },
+      "title": "Evidence Ids",
+      "type": "array"
+    },
+    "features": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Features",
+      "type": "object"
+    },
+    "reason": {
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "rubric_version": {
+      "minLength": 1,
+      "title": "Rubric Version",
+      "type": "string"
+    },
+    "model": {
+      "minLength": 1,
+      "title": "Model",
+      "type": "string"
+    },
+    "abstained": {
+      "default": false,
+      "title": "Abstained",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "dimension",
+    "score",
+    "confidence",
+    "reason",
+    "rubric_version",
+    "model"
+  ],
+  "then": {
+    "properties": {
+      "score": {
+        "const": 0
+      },
+      "confidence": {
+        "const": 0
+      }
+    }
+  },
+  "title": "DimensionScore",
+  "type": "object"
+}
