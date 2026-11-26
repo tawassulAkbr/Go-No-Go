@@ -1,0 +1,17 @@
+# P13. Report, screenshots, submission: **Both members**
+
+> **Owner:** Both members  
+> Part of the CS4032 *Idea Generator with Go / No-Go* project. Rules: `../rule.md` · Checklist: `../project_completion.md` · Index: `../README.md`
+
+
+**Done when:** a fresh clone starts from the README alone, the report PDF is ≤ 10 pages, every checklist item in `project_completion.md §5` is ticked, and both members have signed.
+
+1. **README (Windows-friendly), tested on the *other* member's PC from a fresh clone.** `scripts\bootstrap.ps1` should: check tools → `docker compose up -d` (dev) → create registry + k3d cluster → build/push all images → create secrets from `.env` → `kubectl apply -k k8s/overlays/local` → wait for pods → print the URL (`http://localhost:8080`) and how to run the smoke test.
+2. **Screenshot pass** (Win+Shift+S; save to `docs/screenshots/NN-name.png`; captions in `docs/screenshots/captions.md`): protected main + PR with required checks · merge-conflict PR · green + failing GitHub Actions · green + failing Jenkins · all pods running · rollout + rollback · NetworkPolicy test · UI (profile, Discover, verdict card, challenge, what-if v2, INSUFFICIENT EVIDENCE) · trace, dashboard, drift report · retrieval result, fine-tuning comparison.
+3. **The deliberate merge conflict:** two branches edit the same lines of one file; merge the first; open the PR for the second; resolve in the PR/GitHub editor or locally (`git merge main`, fix markers, commit); keep the screenshot. *(Do this early, in P1–P2, not at the end.)*
+4. **Decision records (≥ 3, ≤ 1 page each, in `docs/decisions/`)**, guide §11.1 template. Suggested: (1) hybrid search with reranking, (2) fine-tuned scorer + hosted fallback, (3) LLM calls routed through M5, (4) sensitivity variant, (5) feasibility-hours formula.
+5. **Report (PDF, ≤ 10 pages; screenshots don't count [B])**. Write in Word/Google Docs (or Markdown → PDF) and **export to PDF**. Sections exactly as in `rule.md §17`: summary and changes from the given architecture · modules + architecture figure · verdict design (gates, weights, thresholds, rubrics, **before/after confusion matrix**, one worked example) · knowledge base (sources, card counts, retrieval results) · fine-tuning (data, settings, comparison table, **one case where it did not help**) · AgenticOps results · platform (pipeline, Kubernetes design, **how requests and limits were measured**) · known limits and next steps.
+6. **AI-usage log** complete (`docs/ai-usage-log.md`). **Contribution table** filled and **signed by both members**; check it against the history: `git shortlog -sn --all` and `git log --pretty="%an %ad" --date=short`. If the history is lopsided, fix the *work*, not the table.
+7. **Access for markers:** add them as collaborators or make the repo public (after `gitleaks detect` is clean on the full history). Open the repo link in a private window to verify.
+8. **Rehearse the demo (10 min):** sign up → profile → Discover (watch agents live, approve a deep search) → submit own idea → answer a clarifying question → verdict card → Challenge → "what would make this GO?" → apply (v2) → compare → an INSUFFICIENT EVIDENCE example → dashboard/trace. **Cross-walkthrough:** each member explains the *other's* modules.
+9. `git tag v1.0` on the final merged commit; submit via **GCR**: repo link, report PDF, screenshots, AI log + decision records, signed contribution table.
