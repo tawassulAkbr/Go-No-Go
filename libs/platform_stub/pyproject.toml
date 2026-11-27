@@ -10,3 +10,6 @@ dependencies = ["fastapi==0.115.12", "httpx==0.28.1", "prometheus-client==0.21.1
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+platform_stub = ["py.typed"]
