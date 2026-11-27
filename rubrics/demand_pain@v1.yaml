@@ -1,0 +1,19 @@
+version: v1
+dimension: demand_pain
+description: Evidence that a named user has a recurring, costly problem.
+features: [independent_complaint_count, recurrence, observed_cost, willingness_to_pay]
+output_schema: DimensionScore.json
+anchors:
+  0: No identifiable problem or user.
+  1: An asserted problem with no independent corroboration.
+  2: A few cited complaints, with unclear frequency or cost.
+  3: Repeated cited complaints from distinct users and a concrete cost.
+  4: Frequent complaints across sources with credible spending or time-loss evidence.
+  5: Strong, repeated evidence of urgent pain and willingness to adopt or pay.
+examples:
+  0: Hypothetical idea with no stated user or problem.
+  1: Founder says students need it but cites no independent user.
+  2: Two users mention the issue once without describing its cost.
+  3: Distinct users describe a weekly task that takes an hour.
+  4: Multiple platforms show recurring complaints and paid workarounds.
+  5: Independent users repeatedly seek a paid fix for an urgent workflow.
