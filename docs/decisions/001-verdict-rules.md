@@ -1,7 +1,9 @@
 # ADR 001: Verdict rule interpretations
 
-**Status:** implementation default; both members must review before final submission.  
-**Date:** 2026-11-28  
+**Status:** implementation default; both members must review before final submission.
+
+**Date:** 2026-11-28
+
 **AI use:** Codex drafted this record and implementation. The worked-example arithmetic is checked by automated tests; the team still needs to review the choices and explain them.
 
 ## Context
