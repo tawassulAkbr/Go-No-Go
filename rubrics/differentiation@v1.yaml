@@ -1,0 +1,19 @@
+version: v1
+dimension: differentiation
+description: Specific, defensible benefit over named alternatives for the same user.
+features: [feature_gap_count, user_fit, switching_reason, defensibility]
+output_schema: DimensionScore.json
+anchors:
+  0: Renamed copy of a named product.
+  1: Cosmetic changes with no user benefit.
+  2: Small differences without evidence that users value them.
+  3: A concrete, cited missing feature matters to the target user.
+  4: Several cited gaps combine into a clear user advantage.
+  5: A tested, hard-to-copy advantage solves the key unmet task.
+examples:
+  0: Same features and audience as a named existing tool.
+  1: Changes only the theme and product name.
+  2: Adds a minor option without a cited request.
+  3: Adds an export target repeatedly requested by the niche.
+  4: Fills several documented gaps in one workflow.
+  5: Demonstrated solution delivers a unique, durable outcome.
