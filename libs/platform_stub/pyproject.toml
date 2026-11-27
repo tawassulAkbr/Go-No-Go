@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "idea-validator-platform-stub"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["fastapi==0.115.12", "httpx==0.28.1", "prometheus-client==0.21.1", "pydantic==2.11.7", "idea-validator-tracing==0.1.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -10,7 +10,7 @@ An interactive multi-agent system that helps a student choose a project. It coll
 
 > **The verdict is made by code, not by a language model.** Models produce six evidence-backed scores (0–5). A deterministic, unit-tested engine (M11) applies hard gates, weights, thresholds, confidence and a sensitivity check. This is decision support, not a prediction of success.
 
-The target deployment uses Kubernetes, GitHub Actions and Jenkins. Phase 0 is complete per team confirmation. Phase 1 adds the installable shared contracts and the repository workflow.
+The target deployment uses Kubernetes, GitHub Actions and Jenkins. Phase 0 is complete per team confirmation. Phase 1 adds the installable shared contracts and the repository workflow. Phase 2 adds deployable service stubs and a clearly marked demo UI; [workstation and team sign-off](docs/Phases/P02_manual_signoff.md) remains required before claiming a running deployment.
 
 ---
 

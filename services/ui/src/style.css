@@ -1,0 +1,11 @@
+:root { font-family: system-ui, sans-serif; color: #162433; background: #f3f5f7; }
+body { margin: 0; }
+main { max-width: 680px; margin: 10vh auto; padding: 2rem; background: white; border-radius: 12px; box-shadow: 0 8px 30px #10203012; }
+h1 { margin-top: .2rem; font-size: 2.5rem; }
+.eyebrow { color: #246687; font-weight: 700; font-size: .85rem; text-transform: uppercase; letter-spacing: .07em; }
+form { display: grid; gap: .7rem; margin-top: 2rem; }
+label { font-weight: 700; }
+textarea { min-height: 7rem; padding: .75rem; font: inherit; border: 1px solid #aebbc5; border-radius: 6px; }
+button { width: max-content; padding: .7rem 1.3rem; font: inherit; font-weight: 700; color: white; background: #12647e; border: 0; border-radius: 6px; cursor: pointer; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+section { margin-top: 2rem; padding: 1rem; border-left: 4px solid #12647e; background: #edf5f8; }
