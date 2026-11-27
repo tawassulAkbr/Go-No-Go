@@ -1,0 +1,19 @@
+version: v1
+dimension: competition
+description: Higher scores mean a more favorable competitive landscape for this student.
+features: [named_competitor_count, substitute_quality, market_saturation, reachable_segment]
+output_schema: DimensionScore.json
+anchors:
+  0: Direct, mature substitutes dominate the same user and task.
+  1: Several strong substitutes leave little reachable space.
+  2: Competitors exist and the proposed segment is weakly defended.
+  3: Competitors exist but a reachable segment is underserved.
+  4: Existing tools cover adjacent needs while the target segment has a clear gap.
+  5: Credible search finds no close substitute for a clearly bounded user need.
+examples:
+  0: A named incumbent already serves the same student and task completely.
+  1: Three strong tools solve nearly all of the proposed workflow.
+  2: Several tools partly solve it and target users switch easily.
+  3: Named tools miss a documented niche workflow.
+  4: Adjacent products exist but none serves the cited segment well.
+  5: Evidence-backed competitor search finds only distant substitutes.
