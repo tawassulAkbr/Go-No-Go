@@ -16,6 +16,7 @@ models/
 data/raw/
 *.log
 .pytest_cache/
+.coverage
 .mypy_cache/
 .ruff_cache/
 .aws/
