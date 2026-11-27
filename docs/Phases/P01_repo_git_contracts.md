@@ -30,7 +30,7 @@
 9. **Protect `main`: do this AFTER the first CI run** (status check names must exist). Matrix jobs show up as `docker (<service>)`, so copy the **exact** names from the PR's checks list into `contexts` (one entry per matrix service; add an entry whenever you add a service to the matrix). Save as `protection.json`:
    ```json
    {
-     "required_status_checks": { "strict": true, "contexts": ["test", "ui", "manifests", "secrets", "docker (gateway)", "docker (verdict)", "docker (tools)", "docker (kb)", "docker (scorer)", "docker (orchestrator)"] },
+     "required_status_checks": { "strict": true, "contexts": ["test", "ui", "manifests", "secrets", "docker (gateway)", "docker (ui)", "docker (profile)", "docker (orchestrator)", "docker (scouts)", "docker (tools)", "docker (kb)", "docker (analyst)", "docker (ideation)", "docker (validators)", "docker (scorer)", "docker (verdict)", "docker (critic)", "docker (agentops)"] },
      "enforce_admins": true,
      "required_pull_request_reviews": { "required_approving_review_count": 1 },
      "restrictions": null
