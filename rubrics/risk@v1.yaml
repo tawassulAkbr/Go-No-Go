@@ -1,0 +1,19 @@
+version: v1
+dimension: risk
+description: Higher scores mean lower legal, safety, privacy and operational risk.
+features: [legal_blockers, safety_impact, data_sensitivity, mitigation_cost]
+output_schema: DimensionScore.json
+anchors:
+  0: Clear legal or safety blocker.
+  1: Serious unresolved harm or compliance concern.
+  2: Material risk with no tested mitigation.
+  3: Bounded risk with a credible mitigation plan.
+  4: Low risk with simple safeguards.
+  5: Minimal risk and no sensitive or harmful use.
+examples:
+  0: Requires collecting private records without authorization.
+  1: Could advise a high-stakes decision without human review.
+  2: Uses sensitive data with an untested security plan.
+  3: Uses public data and documents moderation and retention.
+  4: Processes public metadata with basic rate and access limits.
+  5: Local, non-sensitive utility has no identified safety exposure.
