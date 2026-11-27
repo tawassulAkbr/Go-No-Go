@@ -1,0 +1,11 @@
+version: w2
+weights:
+  startup: {demand_pain: 25, competition: 20, differentiation: 20, feasibility: 15, risk: 15, learning: 5}
+  portfolio: {demand_pain: 15, competition: 15, differentiation: 15, feasibility: 25, risk: 10, learning: 20}
+  course_project: {demand_pain: 10, competition: 10, differentiation: 15, feasibility: 35, risk: 10, learning: 20}
+thresholds: {T_go: 70, T_no: 50, floor: 1.5, min_confidence: 0.5}
+gates: {min_sources: 3, min_platforms: 2, duplicate_diff_min: 3}
+challenge: {penalty: 0.5, max_penalty: 1.0, conf_penalty: 0.1}
+sensitivity: {weight_delta: 0.20, score_delta: 1.0}
+whatif: {step: 0.5}
+abstain: {max_abstained: 1}
