@@ -110,7 +110,7 @@
        steps:
          - uses: actions/checkout@v4
          - run: docker build -f services/${{ matrix.service }}/Dockerfile -t ${{ matrix.service }}:${{ github.sha }} .
-         - uses: aquasecurity/trivy-action@0.24.0
+         - uses: aquasecurity/trivy-action@v0.36.0
            with: { image-ref: "${{ matrix.service }}:${{ github.sha }}", exit-code: "1", severity: "CRITICAL" }
      manifests:
        runs-on: ubuntu-latest
@@ -121,10 +121,15 @@
              kubectl kustomize k8s/overlays/local | ./kubeconform -strict -ignore-missing-schemas -summary
      secrets:
        runs-on: ubuntu-latest
+       permissions:
+         contents: read
+         pull-requests: read
        steps:
-         - uses: actions/checkout@v4
+         - uses: actions/checkout@v6
            with: { fetch-depth: 0 }
-         - uses: gitleaks/gitleaks-action@v2
+         - uses: gitleaks/gitleaks-action@v3
+           env:
+             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
    ```
    In P3, add the verdict-engine suite to the required `test` job; in P5, add UI component tests; in P6, add the retrieval quality gate with real tests and a baseline. Do not use a missing-test exit code as a passing retrieval gate. Before calling P2 green, confirm every path, package, Dockerfile and manifest referenced by these jobs exists. Keep the Docker matrix and required branch-protection contexts in sync with the deployed services.
    Keep one deliberately failing branch (e.g. a unit test that fails) to capture the **failing run** screenshot; then fix it.

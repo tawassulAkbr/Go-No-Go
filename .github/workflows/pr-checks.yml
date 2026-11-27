@@ -28,7 +28,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - run: docker build -f services/${{ matrix.service }}/Dockerfile -t ${{ matrix.service }}:${{ github.sha }} .
-    - uses: aquasecurity/trivy-action@0.24.0
+    - uses: aquasecurity/trivy-action@v0.36.0
       with:
         image-ref: ${{ matrix.service }}:${{ github.sha }}
         exit-code: '1'
@@ -45,7 +45,12 @@ jobs:
         kubectl kustomize k8s/overlays/local | ./kubeconform -strict -ignore-missing-schemas -summary
   secrets:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with: { fetch-depth: 0 }
-    - uses: gitleaks/gitleaks-action@v2
+    - uses: gitleaks/gitleaks-action@v3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
