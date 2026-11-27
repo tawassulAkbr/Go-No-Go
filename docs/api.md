@@ -29,8 +29,8 @@ M1 is the browser entry point. Ingress adds the public prefix `/api` and strips 
 | M5 Tools | POST /llm | Forward messages and optional output schema to the hosted model. Return model output and usage for the run. |
 | M6 Knowledge Base | POST /search | Query with date, source or niche filters. Return ranked Evidence records. |
 | M10 Scorer | POST /score | Score an idea against a dimension rubric and evidence. Return a DimensionScore, including abstention when needed. |
-| M11 Verdict | POST /verdict | Evaluate six scores, profile, gate inputs and versioned config. Return a Verdict. |
-| M11 Verdict | POST /whatif | Evaluate changes against the same inputs and return candidate changes and recomputed outcomes. |
+| M11 Verdict | POST /verdict | Accept `EvaluationInput` (idea/run/version, `Profile`, six cited `DimensionScore` records, independent source and platform counts, estimated build hours, optional risk blocker, duplicate product and accepted objection dimensions). Return the shared `Verdict` with gate reasons and rule versions. |
+| M11 Verdict | POST /whatif | Accept the same `EvaluationInput`; return the smallest single change that yields stable GO, or `null` when no such change is available. Later phases apply accepted changes and persist version 2. |
 | M12 Critic | POST /check | Check claims and their evidence IDs. Return support or rejection per claim. |
 | M13 AgenticOps | POST /trace | Append a batch of Trace records. |
 | M13 AgenticOps | GET /runs/{id}/trace | Retrieve the steps recorded under the run ID. |
