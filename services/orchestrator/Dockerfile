@@ -1,4 +1,4 @@
-ARG PYTHON_IMAGE=python:3.12.10-slim-bookworm
+ARG PYTHON_IMAGE=python:3.12.16-alpine3.23
 FROM ${PYTHON_IMAGE} AS build
 WORKDIR /build
 COPY libs/contracts /build/contracts
