@@ -10,7 +10,7 @@ An interactive multi-agent system that helps a student choose a project. It coll
 
 > **The verdict is made by code, not by a language model.** Models produce six evidence-backed scores (0–5). A deterministic, unit-tested engine (M11) applies hard gates, weights, thresholds, confidence and a sensitivity check. This is decision support, not a prediction of success.
 
-The whole system runs on Kubernetes, one container per module, and is built and shipped by GitHub Actions and Jenkins.
+The target deployment uses Kubernetes, GitHub Actions and Jenkins. Phase 0 is complete per team confirmation. Phase 1 adds the installable shared contracts and the repository workflow. Phase 2 adds deployable service stubs and a clearly marked demo UI; [workstation and team sign-off](docs/Phases/P02_manual_signoff.md) remains required before claiming a running deployment.
 
 ---
 
@@ -18,10 +18,12 @@ The whole system runs on Kubernetes, one container per module, and is built and 
 
 | File | What it is |
 |---|---|
-| `rule.md` | Rules, requirements and limits (tags: **[B]** brief, **[G]** guide, **[T]** our convention). §19 holds our decisions A1–A10 |
-| `project_completion.md` | Master plan: acceptance checklist U1–U10, module checklist M1–M14, submission checklist, timeline |
-| `phases/P00` … `phases/P13` | What each member builds, in order, with Windows setup |
-| `Appendix_commands_and_ports.md` | Command cheat-sheet and port map |
+| [Project brief](docs/Project.pdf) and [project guide](docs/Project_Guide.pdf) | Course requirements and implementation guidance |
+| [Rules](docs/rule.md) | Rules, requirements and limits (tags: **[B]** brief, **[G]** guide, **[T]** our convention). §19 holds our decisions A1–A10 |
+| [Completion checklist](docs/project_completion.md) | Master plan: acceptance checklist U1–U10, module checklist M1–M14, submission checklist, timeline |
+| [Phase plans P00–P13](docs/Phases/) | What each member builds, in order, with Windows setup |
+| [Service interfaces](docs/api.md) | Gateway and internal endpoints used by the modules |
+| [Commands and ports](docs/Phases/Appendix_commands_and_ports.md) | Command cheat-sheet and port map |
 | `docs/decisions/` | Design decision records (at least 3) |
 | `docs/ai-usage-log.md` | Log of what AI tools wrote, what we changed and why |
 | `docs/screenshots/` | Report screenshots with captions in `captions.md` |
@@ -140,7 +142,7 @@ The rules live in `config/verdict.yaml`, deployed as a ConfigMap. Rubrics are ve
 
 **Machine:** Windows 10 22H2 (build 19045+) or Windows 11, **16 GB RAM recommended** (8 GB is very tight), **≥ 40 GB free disk**, virtualization enabled in BIOS/UEFI.
 
-**Tools** (full instructions in `phases/P00_windows_setup.md`):
+**Tools** (full instructions in [Phase 0](docs/Phases/P00_windows_setup.md)):
 
 | Tool | Notes |
 |---|---|
@@ -160,7 +162,7 @@ Keep the repo on a short path such as `C:\dev\idea-validator` (not OneDrive or D
 
 ## Quick start (Windows)
 
-From a fresh clone, in PowerShell:
+The application startup below is planned for P13. For the current workstation setup, follow [Phase 0](docs/Phases/P00_windows_setup.md).
 
 ```powershell
 git clone https://github.com/<OWNER>/idea-validator.git C:\dev\idea-validator
@@ -284,6 +286,18 @@ k3d cluster start idea-validator
 
 ## Development
 
+For Phase 1, run these commands from the repository root on each Windows workstation.
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e libs/contracts pytest pre-commit
+pre-commit install
+python -m pytest -q libs/contracts
+```
+
+After editing a shared model, regenerate its schemas with `python -m contracts.export libs/contracts/schemas` before running the tests. The service commands below apply once the corresponding services exist.
+
 ```powershell
 # one service, e.g. the verdict engine
 cd services\verdict
@@ -359,8 +373,6 @@ Every workload has liveness and readiness probes, runs as non-root with a pinned
 ```
 .
 ├── README.md                     this file
-├── rule.md  project_completion.md  Appendix_commands_and_ports.md
-├── phases/                       P00 … P13: what to build, step by step
 ├── services/                     gateway, ui, profile, orchestrator, scouts, tools, kb,
 │                                 analyst, ideation, validators, scorer, verdict, critic, agentops
 ├── jobs/                         ingestion, finetune, evaluation
@@ -372,7 +384,7 @@ Every workload has liveness and readiness probes, runs as non-root with a pinned
 ├── k8s/                          base/ and overlays/local (Kustomize)
 ├── jenkins/                      Jenkins image
 ├── scripts/                      bootstrap, build/push, deploy, smoke test, rollback, tune, leakage check
-├── docs/                         decisions/, ai-usage-log.md, screenshots/, api.md
+├── docs/                         brief and guide PDFs, Phases/, rules, checklist, AI log and planned report materials
 ├── .github/                      workflows/, PR and issue templates
 ├── Jenkinsfile
 ├── docker-compose.yml            development only; the target is Kubernetes

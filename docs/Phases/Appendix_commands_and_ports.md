@@ -1,6 +1,6 @@
 # Appendix: Commands and Port Map
 
-> Index: `README.md`
+> [Project index](../../README.md)
 
 ## A. Command cheat-sheet (PowerShell)
 

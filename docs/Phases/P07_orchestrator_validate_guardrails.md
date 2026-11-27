@@ -1,7 +1,7 @@
 # P7. Orchestrator, Validate workflow, guardrails: **Member 2** (M3, M9, M12)
 
 > **Owner:** Member 2  
-> Part of the CS4032 *Idea Generator with Go / No-Go* project. Rules: `../rule.md` · Checklist: `../project_completion.md` · Index: `../README.md`
+> Part of the CS4032 *Idea Generator with Go / No-Go* project. [Rules](../rule.md) · [Checklist](../project_completion.md) · [Project index](../../README.md)
 
 
 **Goal:** the full **Validate** path works end to end with a hosted model first (M10 swaps in at P8). **[B §3.2]**

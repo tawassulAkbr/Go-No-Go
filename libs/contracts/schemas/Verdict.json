@@ -1,0 +1,467 @@
+{
+  "$defs": {
+    "DimensionScore": {
+      "additionalProperties": false,
+      "else": {
+        "properties": {
+          "evidence_ids": {
+            "minItems": 1
+          }
+        },
+        "required": [
+          "evidence_ids"
+        ]
+      },
+      "if": {
+        "properties": {
+          "abstained": {
+            "const": true
+          }
+        },
+        "required": [
+          "abstained"
+        ]
+      },
+      "properties": {
+        "dimension": {
+          "enum": [
+            "demand_pain",
+            "competition",
+            "differentiation",
+            "feasibility",
+            "risk",
+            "learning"
+          ],
+          "title": "Dimension",
+          "type": "string"
+        },
+        "score": {
+          "maximum": 5,
+          "minimum": 0,
+          "title": "Score",
+          "type": "number"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "evidence_ids": {
+          "items": {
+            "pattern": "^[^#\\s]+#c[0-9]+$",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "features": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Features",
+          "type": "object"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "rubric_version": {
+          "minLength": 1,
+          "title": "Rubric Version",
+          "type": "string"
+        },
+        "model": {
+          "minLength": 1,
+          "title": "Model",
+          "type": "string"
+        },
+        "abstained": {
+          "default": false,
+          "title": "Abstained",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "dimension",
+        "score",
+        "confidence",
+        "reason",
+        "rubric_version",
+        "model"
+      ],
+      "then": {
+        "properties": {
+          "score": {
+            "const": 0
+          },
+          "confidence": {
+            "const": 0
+          }
+        }
+      },
+      "title": "DimensionScore",
+      "type": "object"
+    },
+    "Flip": {
+      "additionalProperties": false,
+      "properties": {
+        "run": {
+          "exclusiveMinimum": 0,
+          "title": "Run",
+          "type": "integer"
+        },
+        "change": {
+          "minLength": 1,
+          "title": "Change",
+          "type": "string"
+        },
+        "verdict": {
+          "enum": [
+            "GO",
+            "PIVOT",
+            "NO-GO",
+            "INSUFFICIENT_EVIDENCE"
+          ],
+          "title": "Verdict",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run",
+        "change",
+        "verdict"
+      ],
+      "title": "Flip",
+      "type": "object"
+    },
+    "Gate": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "pass",
+            "fail"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "detail": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Detail",
+          "type": "object"
+        }
+      },
+      "required": [
+        "status",
+        "reason",
+        "detail"
+      ],
+      "title": "Gate",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "Sensitivity": {
+      "additionalProperties": false,
+      "properties": {
+        "runs": {
+          "minimum": 0,
+          "title": "Runs",
+          "type": "integer"
+        },
+        "flipped": {
+          "minimum": 0,
+          "title": "Flipped",
+          "type": "integer"
+        },
+        "flips": {
+          "items": {
+            "$ref": "#/$defs/Flip"
+          },
+          "title": "Flips",
+          "type": "array"
+        }
+      },
+      "required": [
+        "runs",
+        "flipped",
+        "flips"
+      ],
+      "title": "Sensitivity",
+      "type": "object"
+    },
+    "Thresholds": {
+      "additionalProperties": false,
+      "properties": {
+        "T_go": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "T Go",
+          "type": "number"
+        },
+        "T_no": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "T No",
+          "type": "number"
+        },
+        "floor": {
+          "maximum": 5,
+          "minimum": 0,
+          "title": "Floor",
+          "type": "number"
+        },
+        "min_confidence": {
+          "default": 0.5,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Min Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "T_go",
+        "T_no",
+        "floor"
+      ],
+      "title": "Thresholds",
+      "type": "object"
+    },
+    "Versions": {
+      "additionalProperties": false,
+      "properties": {
+        "engine": {
+          "minLength": 1,
+          "title": "Engine",
+          "type": "string"
+        },
+        "rubrics": {
+          "minLength": 1,
+          "title": "Rubrics",
+          "type": "string"
+        },
+        "profile_weights": {
+          "minLength": 1,
+          "title": "Profile Weights",
+          "type": "string"
+        },
+        "config": {
+          "minLength": 1,
+          "title": "Config",
+          "type": "string"
+        }
+      },
+      "required": [
+        "engine",
+        "rubrics",
+        "profile_weights",
+        "config"
+      ],
+      "title": "Versions",
+      "type": "object"
+    },
+    "WhatIf": {
+      "additionalProperties": false,
+      "properties": {
+        "change": {
+          "minLength": 1,
+          "title": "Change",
+          "type": "string"
+        },
+        "new_score": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "New Score",
+          "type": "number"
+        },
+        "new_verdict": {
+          "enum": [
+            "GO",
+            "PIVOT",
+            "NO-GO",
+            "INSUFFICIENT_EVIDENCE"
+          ],
+          "title": "New Verdict",
+          "type": "string"
+        }
+      },
+      "required": [
+        "change",
+        "new_score",
+        "new_verdict"
+      ],
+      "title": "WhatIf",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "idea_id": {
+      "minLength": 1,
+      "title": "Idea Id",
+      "type": "string"
+    },
+    "version": {
+      "exclusiveMinimum": 0,
+      "title": "Version",
+      "type": "integer"
+    },
+    "run_id": {
+      "minLength": 1,
+      "title": "Run Id",
+      "type": "string"
+    },
+    "verdict": {
+      "enum": [
+        "GO",
+        "PIVOT",
+        "NO-GO",
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "title": "Verdict",
+      "type": "string"
+    },
+    "stability": {
+      "enum": [
+        "STABLE",
+        "BORDERLINE"
+      ],
+      "title": "Stability",
+      "type": "string"
+    },
+    "score": {
+      "anyOf": [
+        {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Score"
+    },
+    "confidence": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "gates": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Gate"
+      },
+      "minProperties": 1,
+      "propertyNames": {
+        "enum": [
+          "evidence",
+          "feasibility",
+          "risk",
+          "duplicate"
+        ]
+      },
+      "title": "Gates",
+      "type": "object"
+    },
+    "weights": {
+      "additionalProperties": {
+        "maximum": 100,
+        "minimum": 0,
+        "type": "number"
+      },
+      "propertyNames": {
+        "enum": [
+          "demand_pain",
+          "competition",
+          "differentiation",
+          "feasibility",
+          "risk",
+          "learning"
+        ]
+      },
+      "title": "Weights",
+      "type": "object"
+    },
+    "thresholds": {
+      "$ref": "#/$defs/Thresholds"
+    },
+    "scores": {
+      "items": {
+        "$ref": "#/$defs/DimensionScore"
+      },
+      "maxItems": 6,
+      "minItems": 6,
+      "title": "Scores",
+      "type": "array"
+    },
+    "weakest_dimension": {
+      "anyOf": [
+        {
+          "enum": [
+            "demand_pain",
+            "competition",
+            "differentiation",
+            "feasibility",
+            "risk",
+            "learning"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Weakest Dimension"
+    },
+    "what_would_make_go": {
+      "items": {
+        "$ref": "#/$defs/WhatIf"
+      },
+      "title": "What Would Make Go",
+      "type": "array"
+    },
+    "sensitivity": {
+      "$ref": "#/$defs/Sensitivity"
+    },
+    "versions": {
+      "$ref": "#/$defs/Versions"
+    },
+    "missing_evidence": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Missing Evidence",
+      "type": "array"
+    }
+  },
+  "required": [
+    "idea_id",
+    "version",
+    "run_id",
+    "verdict",
+    "stability",
+    "score",
+    "confidence",
+    "gates",
+    "weights",
+    "thresholds",
+    "scores",
+    "weakest_dimension",
+    "what_would_make_go",
+    "sensitivity",
+    "versions",
+    "missing_evidence"
+  ],
+  "title": "Verdict",
+  "type": "object"
+}

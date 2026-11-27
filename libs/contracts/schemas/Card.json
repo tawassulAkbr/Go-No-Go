@@ -1,0 +1,118 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "summary": {
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+    },
+    "problem": {
+      "minLength": 1,
+      "title": "Problem",
+      "type": "string"
+    },
+    "customer": {
+      "minLength": 1,
+      "title": "Customer",
+      "type": "string"
+    },
+    "niche_tags": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Niche Tags",
+      "type": "array"
+    },
+    "stage": {
+      "minLength": 1,
+      "title": "Stage",
+      "type": "string"
+    },
+    "funding_usd": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Funding Usd"
+    },
+    "source": {
+      "minLength": 1,
+      "title": "Source",
+      "type": "string"
+    },
+    "url": {
+      "format": "uri",
+      "maxLength": 2083,
+      "minLength": 1,
+      "title": "Url",
+      "type": "string"
+    },
+    "published_at": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Published At"
+    },
+    "fetched_at": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "format": "date-time",
+          "type": "string"
+        }
+      ],
+      "title": "Fetched At"
+    },
+    "text": {
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "summary",
+    "problem",
+    "customer",
+    "niche_tags",
+    "stage",
+    "funding_usd",
+    "source",
+    "url",
+    "published_at",
+    "fetched_at",
+    "text"
+  ],
+  "title": "Card",
+  "type": "object"
+}

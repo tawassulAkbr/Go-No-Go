@@ -1,18 +1,18 @@
 # P5. Gateway and Web UI: **Member 2** (M1)
 
 > **Owner:** Member 2  
-> Part of the CS4032 *Idea Generator with Go / No-Go* project. Rules: `../rule.md` · Checklist: `../project_completion.md` · Index: `../README.md`
+> Part of the CS4032 *Idea Generator with Go / No-Go* project. [Rules](../rule.md) · [Checklist](../project_completion.md) · [Project index](../../README.md)
 
 
 **Goal:** the only entrance to the system: login, profile, Discover/Validate screens, live progress, approval prompt, verdict card, history/compare. **[B]**
-**Depends on:** P1 contracts, P2 ingress. Uses stubs for M3/M2 until P4/P7 land.
+**Depends on:** P1 contracts, P2 ingress and the minimal `services/ui` and `services/gateway` stubs. P5 builds the actual UI and gateway in those folders. Uses stubs for M3/M2 until P4/P7 land.
 **Done when:** U1, U3 (with fake events), U4 (fake), U6, U9 work in the browser on the cluster, and `npm test` (component tests) is green.
 
 ### Windows setup
 ```powershell
-cd C:\dev\idea-validator\services
-npm create vite@latest ui -- --template react-ts
-cd ui ; npm install
+cd C:\dev\idea-validator\services\ui
+# Continue from the P2 UI stub and its committed package-lock.json; do not create a second ui project.
+npm ci
 npm install -D vitest jsdom @testing-library/react @testing-library/jest-dom @testing-library/user-event eslint
 npm install react-router-dom
 npm run dev                                         # http://localhost:5173  (proxy /api → gateway)

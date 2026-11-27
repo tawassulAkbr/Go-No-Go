@@ -21,7 +21,7 @@ Keywords: **MUST** / **MUST NOT** are non-negotiable. **SHOULD** is the default 
 
 1. Group of **2** students. **Both** members commit code, review each other's pull requests, and must be able to explain the **whole** system, not only their own modules. **[B]**
 2. The contribution table is **signed by both members** and **must match the git history**. So neither member may do all the commits, and no work may be committed under the other person's name. **[B]**
-3. Each member owns the modules assigned in `phases/`, but every module needs the other member as reviewer. **[T]**
+3. Each member owns the modules assigned in [phase plans](Phases/), but every module needs the other member as reviewer. **[T]**
 4. One issue per task, linked to its pull request. Small branches with one purpose. **[G]**
 5. Before the final submission, each member walks the other through every module (30 minutes each). Anything the other can't explain is rewritten or documented. **[T]**
 
@@ -215,7 +215,7 @@ lint + type checks · unit tests (incl. Verdict Engine) · component tests (UI) 
 
 1. Windows 10 22H2 or Windows 11; **virtualization enabled** in BIOS/UEFI; **WSL 2** + **Docker Desktop (WSL 2 backend)**.
 2. **Do not** enable Docker Desktop's built-in Kubernetes. We use **k3d** (k3s in Docker) because it enforces NetworkPolicy.
-3. Cap WSL memory in `%UserProfile%\.wslconfig` so the laptop stays usable (see `phases/` P0).
+3. Cap WSL memory in `%UserProfile%\.wslconfig` so the laptop stays usable (see [Phase 0](Phases/P00_windows_setup.md)).
 4. Keep the repo in a **short path** (`C:\dev\idea-validator`) and run `git config --global core.longpaths true`.
 5. **Line endings:** commit `.gitattributes` with `* text=auto eol=lf` (and `*.ps1 text eol=crlf`). Shell scripts with CRLF break inside Linux containers (`bad interpreter`).
 6. Shell scripts (`*.sh`) run **inside Linux containers / Jenkins**. On Windows, run them from Git Bash or WSL. PowerShell equivalents live next to them when a member needs one.

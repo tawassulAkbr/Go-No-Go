@@ -1,7 +1,7 @@
 # P12. Labelling, tuning and evaluation: **Both members**
 
 > **Owner:** Both members  
-> Part of the CS4032 *Idea Generator with Go / No-Go* project. Rules: `../rule.md` · Checklist: `../project_completion.md` · Index: `../README.md`
+> Part of the CS4032 *Idea Generator with Go / No-Go* project. [Rules](../rule.md) · [Checklist](../project_completion.md) · [Project index](../../README.md)
 
 
 **Goal:** thresholds and weights that agree with humans, with honest before/after numbers. **[G §10]**
@@ -14,4 +14,4 @@
 5. **Tune** `T_go`, `T_no`, `floor`, weights (grid/random search script `scripts/tune.py`). Objective: maximise agreement but **penalise "GO where humans said NO-GO" most**; report that error **separately** [G]. **Hold out ~30 %** of the labelled set (tune on 70 %, check on 30 %) so values don't over-fit [G]. With only 30–40 ideas that is ~10 held out, too few for a stable number: aim for ≥ 50 labelled ideas, or use 5-fold cross-validation and report the spread.
 6. Justify any change to the weight presets in a short note/DDR [B].
 7. **AFTER confusion matrix** (`eval/results/after.json`), plots with `matplotlib` (`pip install matplotlib scikit-learn`).
-8. Put final values in `k8s/base/verdict-config.yaml` (ConfigMap) and `config/verdict.yaml`; roll out; **re-run** the evaluation, the model comparison and the retrieval benchmark to get the final report numbers.
+8. Put final values only in `config/verdict.yaml`. P3's Kustomize `configMapGenerator` must generate the deployed ConfigMap from that file; do not maintain a second hand-edited `k8s/base/verdict-config.yaml`. Build the overlay, roll out the generated config, then **re-run** the evaluation, the model comparison and the retrieval benchmark to get the final report numbers.

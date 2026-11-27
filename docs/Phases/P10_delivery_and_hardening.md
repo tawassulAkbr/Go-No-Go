@@ -1,7 +1,7 @@
 # P10. Delivery and hardening: **Member 1** (M14 part 2, M5 NetworkPolicy)
 
 > **Owner:** Member 1  
-> Part of the CS4032 *Idea Generator with Go / No-Go* project. Rules: `../rule.md` · Checklist: `../project_completion.md` · Index: `../README.md`
+> Part of the CS4032 *Idea Generator with Go / No-Go* project. [Rules](../rule.md) · [Checklist](../project_completion.md) · [Project index](../../README.md)
 
 
 **Goal:** Jenkins delivers merged code to the cluster safely; the cluster is locked down and measured. **[B][G §8–9]**
@@ -33,10 +33,10 @@
    k3d kubeconfig get idea-validator > kubeconfig-jenkins.yaml
    ```
    Edit `server:` to `https://k3d-idea-validator-serverlb:6443` (resolvable inside the k3d network). If you get a TLS name error: lab-only fix: delete `certificate-authority-data` and add `insecure-skip-tls-verify: true`, and note it in the report. Upload via *Manage Jenkins → Credentials → Global → Add → Secret file*, ID **`kubeconfig`**. **Delete the local file afterwards; never commit it.**
-4. **GitHub access:** add a GitHub token credential (*Username with password*, ID `github`). Create a **Pipeline job** (*Pipeline script from SCM*, repo URL, branch `main`, script path `Jenkinsfile`).
+4. **GitHub access:** the P2 Jenkins Pipeline job (*Pipeline script from SCM*, repo URL, branch `main`, script path `Jenkinsfile`) and credentials should already exist for the early smoke run. Verify its GitHub token credential (*Username with password*, ID `github`) and update the job as needed for the full delivery pipeline.
 5. **Trigger:** webhooks can't reach a laptop → **SCM polling** `H/2 * * * *`, or a tunnel (`ngrok http 8081`) if you prefer webhooks [G]. **Nightly eval:** `cron('H 2 * * *')`.
 
-### 10B. `Jenkinsfile` (extends the guide's example)
+### 10B. Extend the P2 `Jenkinsfile` (guide's example)
 ```groovy
 pipeline {
   agent any

@@ -1,0 +1,644 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: idea-validator
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector: { matchLabels: { app: gateway } }
+  template:
+    metadata: { labels: { app: gateway } }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+      - name: gateway
+        image: k3d-idea-registry:5001/gateway:0000000
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef: { name: platform-config }
+        ports: [{ containerPort: 8000 }]
+        readinessProbe:
+          httpGet: { path: /ready, port: 8000 }
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: { path: /health, port: 8000 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests: { cpu: 25m, memory: 64Mi }
+          limits: { cpu: 250m, memory: 256Mi }
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: { drop: [ALL] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: idea-validator
+spec:
+  selector: { app: gateway }
+  ports: [{ port: 8000, targetPort: 8000 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui
+  namespace: idea-validator
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector: { matchLabels: { app: ui } }
+  template:
+    metadata: { labels: { app: ui } }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+      - name: ui
+        image: k3d-idea-registry:5001/ui:0000000
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef: { name: platform-config }
+        ports: [{ containerPort: 8080 }]
+        readinessProbe:
+          httpGet: { path: /ready, port: 8080 }
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: { path: /health, port: 8080 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests: { cpu: 25m, memory: 64Mi }
+          limits: { cpu: 250m, memory: 256Mi }
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: { drop: [ALL] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ui
+  namespace: idea-validator
+spec:
+  selector: { app: ui }
+  ports: [{ port: 80, targetPort: 8080 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: profile
+  namespace: idea-validator
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector: { matchLabels: { app: profile } }
+  template:
+    metadata: { labels: { app: profile } }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+      - name: profile
+        image: k3d-idea-registry:5001/profile:0000000
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef: { name: platform-config }
+        ports: [{ containerPort: 8000 }]
+        readinessProbe:
+          httpGet: { path: /ready, port: 8000 }
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: { path: /health, port: 8000 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests: { cpu: 25m, memory: 64Mi }
+          limits: { cpu: 250m, memory: 256Mi }
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: { drop: [ALL] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: profile
+  namespace: idea-validator
+spec:
+  selector: { app: profile }
+  ports: [{ port: 8000, targetPort: 8000 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orchestrator
+  namespace: idea-validator
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector: { matchLabels: { app: orchestrator } }
+  template:
+    metadata: { labels: { app: orchestrator } }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+      - name: orchestrator
+        image: k3d-idea-registry:5001/orchestrator:0000000
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef: { name: platform-config }
+        ports: [{ containerPort: 8000 }]
+        readinessProbe:
+          httpGet: { path: /ready, port: 8000 }
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: { path: /health, port: 8000 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests: { cpu: 25m, memory: 64Mi }
+          limits: { cpu: 250m, memory: 256Mi }
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: { drop: [ALL] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orchestrator
+  namespace: idea-validator
+spec:
+  selector: { app: orchestrator }
+  ports: [{ port: 8000, targetPort: 8000 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scouts
+  namespace: idea-validator
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector: { matchLabels: { app: scouts } }
+  template:
+    metadata: { labels: { app: scouts } }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+      - name: scouts
+        image: k3d-idea-registry:5001/scouts:0000000
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef: { name: platform-config }
+        ports: [{ containerPort: 8000 }]
+        readinessProbe:
+          httpGet: { path: /ready, port: 8000 }
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: { path: /health, port: 8000 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests: { cpu: 25m, memory: 64Mi }
+          limits: { cpu: 250m, memory: 256Mi }
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: { drop: [ALL] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scouts
+  namespace: idea-validator
+spec:
+  selector: { app: scouts }
+  ports: [{ port: 8000, targetPort: 8000 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tools
+  namespace: idea-validator
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector: { matchLabels: { app: tools } }
+  template:
+    metadata: { labels: { app: tools, egress: internet } }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+      - name: tools
+        image: k3d-idea-registry:5001/tools:0000000
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef: { name: platform-config }
+        ports: [{ containerPort: 8000 }]
+        readinessProbe:
+          httpGet: { path: /ready, port: 8000 }
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: { path: /health, port: 8000 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests: { cpu: 25m, memory: 64Mi }
+          limits: { cpu: 250m, memory: 256Mi }
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: { drop: [ALL] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tools
+  namespace: idea-validator
+spec:
+  selector: { app: tools }
+  ports: [{ port: 8000, targetPort: 8000 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kb
+  namespace: idea-validator
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector: { matchLabels: { app: kb } }
+  template:
+    metadata: { labels: { app: kb } }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+      - name: kb
+        image: k3d-idea-registry:5001/kb:0000000
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef: { name: platform-config }
+        ports: [{ containerPort: 8000 }]
+        readinessProbe:
+          httpGet: { path: /ready, port: 8000 }
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: { path: /health, port: 8000 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests: { cpu: 25m, memory: 64Mi }
+          limits: { cpu: 250m, memory: 256Mi }
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: { drop: [ALL] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kb
+  namespace: idea-validator
+spec:
+  selector: { app: kb }
+  ports: [{ port: 8000, targetPort: 8000 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analyst
+  namespace: idea-validator
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector: { matchLabels: { app: analyst } }
+  template:
+    metadata: { labels: { app: analyst } }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+      - name: analyst
+        image: k3d-idea-registry:5001/analyst:0000000
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef: { name: platform-config }
+        ports: [{ containerPort: 8000 }]
+        readinessProbe:
+          httpGet: { path: /ready, port: 8000 }
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: { path: /health, port: 8000 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests: { cpu: 25m, memory: 64Mi }
+          limits: { cpu: 250m, memory: 256Mi }
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: { drop: [ALL] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analyst
+  namespace: idea-validator
+spec:
+  selector: { app: analyst }
+  ports: [{ port: 8000, targetPort: 8000 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ideation
+  namespace: idea-validator
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector: { matchLabels: { app: ideation } }
+  template:
+    metadata: { labels: { app: ideation } }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+      - name: ideation
+        image: k3d-idea-registry:5001/ideation:0000000
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef: { name: platform-config }
+        ports: [{ containerPort: 8000 }]
+        readinessProbe:
+          httpGet: { path: /ready, port: 8000 }
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: { path: /health, port: 8000 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests: { cpu: 25m, memory: 64Mi }
+          limits: { cpu: 250m, memory: 256Mi }
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: { drop: [ALL] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ideation
+  namespace: idea-validator
+spec:
+  selector: { app: ideation }
+  ports: [{ port: 8000, targetPort: 8000 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: validators
+  namespace: idea-validator
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector: { matchLabels: { app: validators } }
+  template:
+    metadata: { labels: { app: validators } }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+      - name: validators
+        image: k3d-idea-registry:5001/validators:0000000
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef: { name: platform-config }
+        ports: [{ containerPort: 8000 }]
+        readinessProbe:
+          httpGet: { path: /ready, port: 8000 }
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: { path: /health, port: 8000 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests: { cpu: 25m, memory: 64Mi }
+          limits: { cpu: 250m, memory: 256Mi }
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: { drop: [ALL] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: validators
+  namespace: idea-validator
+spec:
+  selector: { app: validators }
+  ports: [{ port: 8000, targetPort: 8000 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scorer
+  namespace: idea-validator
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector: { matchLabels: { app: scorer } }
+  template:
+    metadata: { labels: { app: scorer } }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+      - name: scorer
+        image: k3d-idea-registry:5001/scorer:0000000
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef: { name: platform-config }
+        ports: [{ containerPort: 8000 }]
+        readinessProbe:
+          httpGet: { path: /ready, port: 8000 }
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: { path: /health, port: 8000 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests: { cpu: 25m, memory: 64Mi }
+          limits: { cpu: 250m, memory: 256Mi }
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: { drop: [ALL] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scorer
+  namespace: idea-validator
+spec:
+  selector: { app: scorer }
+  ports: [{ port: 8000, targetPort: 8000 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: verdict
+  namespace: idea-validator
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector: { matchLabels: { app: verdict } }
+  template:
+    metadata: { labels: { app: verdict } }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+      - name: verdict
+        image: k3d-idea-registry:5001/verdict:0000000
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef: { name: platform-config }
+        ports: [{ containerPort: 8000 }]
+        readinessProbe:
+          httpGet: { path: /ready, port: 8000 }
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: { path: /health, port: 8000 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests: { cpu: 25m, memory: 64Mi }
+          limits: { cpu: 250m, memory: 256Mi }
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: { drop: [ALL] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: verdict
+  namespace: idea-validator
+spec:
+  selector: { app: verdict }
+  ports: [{ port: 8000, targetPort: 8000 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: critic
+  namespace: idea-validator
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector: { matchLabels: { app: critic } }
+  template:
+    metadata: { labels: { app: critic } }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+      - name: critic
+        image: k3d-idea-registry:5001/critic:0000000
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef: { name: platform-config }
+        ports: [{ containerPort: 8000 }]
+        readinessProbe:
+          httpGet: { path: /ready, port: 8000 }
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: { path: /health, port: 8000 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests: { cpu: 25m, memory: 64Mi }
+          limits: { cpu: 250m, memory: 256Mi }
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: { drop: [ALL] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: critic
+  namespace: idea-validator
+spec:
+  selector: { app: critic }
+  ports: [{ port: 8000, targetPort: 8000 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agentops
+  namespace: idea-validator
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector: { matchLabels: { app: agentops } }
+  template:
+    metadata: { labels: { app: agentops } }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+      - name: agentops
+        image: k3d-idea-registry:5001/agentops:0000000
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef: { name: platform-config }
+        ports: [{ containerPort: 8000 }]
+        readinessProbe:
+          httpGet: { path: /ready, port: 8000 }
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: { path: /health, port: 8000 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests: { cpu: 25m, memory: 64Mi }
+          limits: { cpu: 250m, memory: 256Mi }
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: { drop: [ALL] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agentops
+  namespace: idea-validator
+spec:
+  selector: { app: agentops }
+  ports: [{ port: 8000, targetPort: 8000 }]
+---

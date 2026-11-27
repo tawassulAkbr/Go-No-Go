@@ -1,7 +1,7 @@
 # P8. Fine-tuning and the scoring-model service: **Member 2** (M10t, M10)
 
 > **Owner:** Member 2  
-> Part of the CS4032 *Idea Generator with Go / No-Go* project. Rules: `../rule.md` · Checklist: `../project_completion.md` · Index: `../README.md`
+> Part of the CS4032 *Idea Generator with Go / No-Go* project. [Rules](../rule.md) · [Checklist](../project_completion.md) · [Project index](../../README.md)
 
 
 **Goal:** a **cheaper, faster, more consistent** 1B–3B scorer that follows our rubric and evidence rule; **not** "smarter than hosted". **[G §6]**
