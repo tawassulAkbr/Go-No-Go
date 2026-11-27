@@ -1,0 +1,19 @@
+version: v1
+dimension: learning
+description: Value to the student's learning goals and demonstrable portfolio.
+features: [goal_alignment, new_skills, demonstrable_artifact, explanation_quality]
+output_schema: DimensionScore.json
+anchors:
+  0: No meaningful learning or portfolio relevance.
+  1: Repeats familiar work with little demonstrable output.
+  2: Some learning but a weak artifact for the stated goal.
+  3: Teaches relevant skills and yields a clear demonstration.
+  4: Builds several goal-aligned skills with measurable results.
+  5: Deep learning and a polished, explainable artifact for the goal.
+examples:
+  0: Unrelated repetitive data entry project.
+  1: Rebuilds a tutorial the student already completed.
+  2: Adds one minor skill but cannot be demonstrated clearly.
+  3: Shows a deployed service and explains one new technique.
+  4: Measures quality and demonstrates several relevant techniques.
+  5: Reproducible project shows strong new skills and tradeoffs.
