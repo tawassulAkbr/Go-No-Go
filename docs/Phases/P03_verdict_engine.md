@@ -17,7 +17,7 @@ uvicorn src.main:app --reload --port 8111      # local run; Swagger at http://lo
 ```
 
 ### Steps
-1. **Config in a file that becomes a ConfigMap** (`config/verdict.yaml`, mounted at runtime, never hard-coded):
+1. **Config in a file that becomes a ConfigMap** (`k8s/base/config/verdict.yaml`, mounted at runtime, never hard-coded; Kustomize requires generator files within its base directory):
    ```yaml
    version: w2
    weights:                      # each preset sums to 100
@@ -47,6 +47,6 @@ uvicorn src.main:app --reload --port 8111      # local run; Swagger at http://lo
    - Feasibility weight 25 → 20 → **≈ 69.9 PIVOT** → card says GO, BORDERLINE
    - Competition 2.0 → 3.0 → **73.5**, ≈ **73.1** under the same weights → stable GO. **Test this by recomputing with Competition = 3.0 directly.** Test `what_would_make_go` separately: it must return the smallest change on the 0.5 grid that gives a stable GO.
 6. **Rubrics** (`rubrics/<dimension>@vN.yaml`, one per dimension): anchors for each score 0–5, `features`, `output_schema`, at least one worked example per level (guide §10 template). Write all six now; M9/M10 use them in P7/P8.
-7. **Dockerfile + k8s:** build image, push, replace the stub's image; mount `config/verdict.yaml` via ConfigMap (Member 1 helps in P2 manifests). Generate the ConfigMap from `config/verdict.yaml` with a kustomize `configMapGenerator` so the file and the ConfigMap cannot drift (P12 edits only this file).
+7. **Dockerfile + k8s:** build image, push, replace the stub's image; mount `k8s/base/config/verdict.yaml` via ConfigMap (Member 1 helps in P2 manifests). Generate the ConfigMap from this file with a kustomize `configMapGenerator` so the file and the ConfigMap cannot drift (P12 edits only this file).
 
 **Done when also:** coverage of `engine.py` ≈ 100 % (this is the module the markers will poke).
