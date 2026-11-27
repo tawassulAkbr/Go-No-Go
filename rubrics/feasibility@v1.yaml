@@ -1,0 +1,19 @@
+version: v1
+dimension: feasibility
+description: Fit between implementation demands and the student's skills, hours, team and compute.
+features: [estimated_hours, available_hours, skill_gap, compute_need, dependency_risk]
+output_schema: DimensionScore.json
+anchors:
+  0: Cannot be built with available time, skills or compute.
+  1: Major unfilled capability or resource gap.
+  2: Possible only after substantial scope reduction.
+  3: Plausible within resources with a bounded risk.
+  4: Clear implementation path with modest contingency.
+  5: Well-scoped build closely matches proven skills and resources.
+examples:
+  0: Requires a large GPU cluster beyond a laptop budget.
+  1: Needs months of unfamiliar low-level work in a short course.
+  2: Several features must be removed to fit the calendar.
+  3: A scoped MVP fits the hours but one integration is unfamiliar.
+  4: Student knows the stack and has time for one setback.
+  5: Small MVP fits tested skills and leaves ample slack.
