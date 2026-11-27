@@ -1,0 +1,51 @@
+name: pr-checks
+on: pull_request
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with: { python-version: '3.12' }
+    - run: python -m pip install -r requirements-dev.txt
+    - run: ruff check libs services
+    - run: mypy libs/contracts/src libs/platform_stub/src libs/tracing/src
+    - run: python -m pytest --import-mode=importlib libs/contracts libs/platform_stub libs/tracing services -q
+  ui:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with: { node-version: '20' }
+    - run: npm ci && npm run lint && npm test -- --run && npm run build
+      working-directory: services/ui
+  docker:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [gateway, ui, profile, orchestrator, scouts, tools, kb, analyst, ideation, validators, scorer, verdict, critic, agentops]
+    steps:
+    - uses: actions/checkout@v4
+    - run: docker build -f services/${{ matrix.service }}/Dockerfile -t ${{ matrix.service }}:${{ github.sha }} .
+    - uses: aquasecurity/trivy-action@0.24.0
+      with:
+        image-ref: ${{ matrix.service }}:${{ github.sha }}
+        exit-code: '1'
+        severity: CRITICAL
+  manifests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: azure/setup-kubectl@v4
+      with: { version: v1.31.0 }
+    - run: |
+        curl -fsSLo kubeconform.tar.gz https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz
+        tar xzf kubeconform.tar.gz kubeconform
+        kubectl kustomize k8s/overlays/local | ./kubeconform -strict -ignore-missing-schemas -summary
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with: { fetch-depth: 0 }
+    - uses: gitleaks/gitleaks-action@v2
