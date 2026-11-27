@@ -1,7 +1,7 @@
 # P5. Gateway and Web UI: **Member 2** (M1)
 
 > **Owner:** Member 2  
-> Part of the CS4032 *Idea Generator with Go / No-Go* project. Rules: `../rule.md` · Checklist: `../project_completion.md` · Index: `../README.md`
+> Part of the CS4032 *Idea Generator with Go / No-Go* project. [Rules](../rule.md) · [Checklist](../project_completion.md) · [Project index](../../README.md)
 
 
 **Goal:** the only entrance to the system: login, profile, Discover/Validate screens, live progress, approval prompt, verdict card, history/compare. **[B]**

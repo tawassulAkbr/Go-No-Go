@@ -1,11 +1,11 @@
 # P0. Windows workstation setup: **Both members, each on their own PC**
 
 > **Owner:** Both members (each on their own PC)  
-> Part of the CS4032 *Idea Generator with Go / No-Go* project. Rules: `../rule.md` · Checklist: `../project_completion.md` · Index: `../README.md`
+> Part of the CS4032 *Idea Generator with Go / No-Go* project. [Rules](../rule.md) · [Checklist](../project_completion.md) · [Project index](../../README.md)
 
 
 **Goal:** both laptops can build images, run a local Kubernetes, and use the same toolchain.
-**Done when:** `scripts/check_env.ps1` (below) prints `[OK]` for everything on **both** machines.
+**Done when:** each member completes the workstation setup, runs the Docker smoke test in §0.4, and gets exit code 0 from the checker in §0.7. Cluster creation belongs to P2.
 
 ### 0.1 Requirements
 - Windows 10 22H2 (build 19045+) or Windows 11; **16 GB RAM recommended** (8 GB is very tight); **≥ 40 GB free disk**.
@@ -13,7 +13,7 @@
 
 ### 0.2 Enable WSL 2 (Admin PowerShell, then reboot)
 ```powershell
-wsl --install            # installs WSL2 + Ubuntu; reboot when asked
+wsl --install -d Ubuntu  # reboot when asked, then open Ubuntu to finish setup
 wsl --set-default-version 2
 wsl --status
 ```
@@ -77,29 +77,14 @@ VS Code extensions: *Python*, *Pylance*, *Docker*, *Kubernetes*, *YAML*, *GitLen
 Use a **short path**: `C:\dev\idea-validator`. Avoid OneDrive/Desktop (sync + long paths cause pain).
 
 ### 0.7 Environment check script
-Save as `scripts/check_env.ps1` (commit it in P1):
+Run the [environment checker](../../scripts/check_env.ps1) from the repository root on each Windows PC after reopening PowerShell and starting Docker Desktop.
+
 ```powershell
-$checks = [ordered]@{
-  "git"     = { git --version }
-  "gh"      = { (gh --version)[0] }
-  "python"  = { py -3.12 --version }
-  "node"    = { node --version }
-  "docker"  = { docker --version }
-  "compose" = { docker compose version }
-  "daemon"  = { docker info --format "{{.ServerVersion}}" }
-  "kubectl" = { kubectl version --client }
-  "helm"    = { helm version --short }
-  "k3d"     = { k3d version }
-}
-foreach ($k in $checks.Keys) {
-  try {
-    $out = & $checks[$k] 2>&1 | Select-Object -First 1
-    if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw $out }
-    Write-Host ("[OK]   {0,-8} {1}" -f $k, $out) -ForegroundColor Green
-  } catch { Write-Host ("[FAIL] {0,-8} {1}" -f $k, $_) -ForegroundColor Red }
-}
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check_env.ps1
+$LASTEXITCODE
 ```
-Run: `powershell -ExecutionPolicy Bypass -File scripts\check_env.ps1`
+
+Each failed check names the tool or setting to fix. Exit code 0 means all checks passed. Confirm disk space, Docker Desktop settings and the `hello-world` run separately, then record the result in the [completion checklist](../project_completion.md).
 
 ### 0.8 Windows pitfalls
 | Symptom | Fix |

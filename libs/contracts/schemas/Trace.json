@@ -1,0 +1,140 @@
+{
+  "$defs": {
+    "JsonValue": {}
+  },
+  "additionalProperties": false,
+  "properties": {
+    "run_id": {
+      "minLength": 1,
+      "title": "Run Id",
+      "type": "string"
+    },
+    "step_id": {
+      "minimum": 0,
+      "title": "Step Id",
+      "type": "integer"
+    },
+    "parent_step": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Parent Step"
+    },
+    "agent": {
+      "minLength": 1,
+      "title": "Agent",
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "tool_call",
+        "llm_call",
+        "decision"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "tool": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Tool"
+    },
+    "input": {
+      "$ref": "#/$defs/JsonValue"
+    },
+    "output": {
+      "$ref": "#/$defs/JsonValue"
+    },
+    "tokens_in": {
+      "minimum": 0,
+      "title": "Tokens In",
+      "type": "integer"
+    },
+    "tokens_out": {
+      "minimum": 0,
+      "title": "Tokens Out",
+      "type": "integer"
+    },
+    "cost_usd": {
+      "minimum": 0,
+      "title": "Cost Usd",
+      "type": "number"
+    },
+    "latency_ms": {
+      "minimum": 0,
+      "title": "Latency Ms",
+      "type": "integer"
+    },
+    "retries": {
+      "minimum": 0,
+      "title": "Retries",
+      "type": "integer"
+    },
+    "model": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Model"
+    },
+    "cache_hit": {
+      "title": "Cache Hit",
+      "type": "boolean"
+    },
+    "error": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Error"
+    },
+    "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "step_id",
+    "parent_step",
+    "agent",
+    "kind",
+    "tool",
+    "input",
+    "output",
+    "tokens_in",
+    "tokens_out",
+    "cost_usd",
+    "latency_ms",
+    "retries",
+    "model",
+    "cache_hit",
+    "error",
+    "ts"
+  ],
+  "title": "Trace",
+  "type": "object"
+}

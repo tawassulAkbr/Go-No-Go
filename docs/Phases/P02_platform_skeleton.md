@@ -1,7 +1,7 @@
 # P2. Platform skeleton: **Member 1** (M14, part 1)
 
 > **Owner:** Member 1  
-> Part of the CS4032 *Idea Generator with Go / No-Go* project. Rules: `../rule.md` · Checklist: `../project_completion.md` · Index: `../README.md`
+> Part of the CS4032 *Idea Generator with Go / No-Go* project. [Rules](../rule.md) · [Checklist](../project_completion.md) · [Project index](../../README.md)
 
 
 **Goal:** a **thin version of everything running end to end on Kubernetes** (stubs for all modules), plus green PR checks. **[G §12: do not leave K8s to the end]**
@@ -41,13 +41,14 @@
 3. **Service template** `services/_template/` (copy for each module): `src/main.py` with FastAPI app exposing `GET /health`, `GET /ready`, `GET /metrics` (`prometheus-client`), reading config from environment. `requirements.txt` with **pinned** versions. `tests/test_health.py`. Also create the shared `libs/tracing` stub here (a context manager that prints one JSON trace line to stdout; P11 later adds the batch POST to M13) so every service emits traces from its first version.
 4. **Dockerfile pattern** (guide §4.4, adapted for the repo-root context):
    ```dockerfile
-   FROM python:3.12.16-slim AS build        # pinned patch tag (rule.md §12.2); newest 3.12 slim on Docker Hub in Nov 2026; re-check and bump deliberately, an old tag fails the Trivy CRITICAL gate
+   ARG PYTHON_IMAGE
+   FROM ${PYTHON_IMAGE} AS build
    WORKDIR /app
    COPY libs/contracts /contracts
    COPY services/verdict/requirements.txt .
    RUN pip install --no-cache-dir --prefix=/install -r requirements.txt /contracts
 
-   FROM python:3.12.16-slim
+   FROM ${PYTHON_IMAGE}
    RUN useradd -m app
    WORKDIR /app
    COPY --from=build /install /usr/local
@@ -56,7 +57,7 @@
    EXPOSE 8000
    CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
    ```
-   Build: `docker build -f services/verdict/Dockerfile -t localhost:5001/verdict:$sha .`
+   Set the `PYTHON_IMAGE` argument default in the Dockerfile to a verified Python 3.12 slim patch tag before the first build. Build: `docker build -f services/verdict/Dockerfile -t localhost:5001/verdict:$sha .`
 5. **Build/push script** `scripts/build_push.ps1` for your PC, and for Jenkins the LF shell scripts `scripts/build_all.sh <tag>` and `scripts/push_images.sh <tag>` (the names P10's Jenkinsfile calls): for each `services/*` folder → `docker build` → tag with `$(git rev-parse --short HEAD)` → `docker push localhost:5001/<name>:<sha>`. **Never tag only `latest` [G].**
 6. **Kubernetes base manifests** in `k8s/base/` with a `kustomization.yaml` (deployed with `kubectl apply -k k8s/overlays/local`): one **Deployment + Service per module** (gateway, ui, **profile (M2)**, orchestrator, **scouts (Deployment + Service for on-demand `POST /scout`; the CronJobs are added in P4)**, tools, kb, analyst, ideation, validators, scorer, verdict, critic, agentops) using the guide's §9.2 pattern: `envFrom` ConfigMap, **liveness `/health` + readiness `/ready`**, `resources`, `runAsNonRoot`. Image = `k3d-idea-registry:5001/<name>:<sha>`.
    Postgres / Redis / Qdrant as **StatefulSets with PVCs** (ready for P4/P6).
@@ -129,6 +130,8 @@
    Keep one deliberately failing branch (e.g. a unit test that fails) to capture the **failing run** screenshot; then fix it.
 9. **Smoke test** `scripts/smoke_test.sh`: `curl -fsS http://localhost:8080/api/health` and `kubectl get pods -n idea-validator` (no pod not Ready).
 10. After the first green run, **apply branch protection** (P1-A step 9).
+
+11. Run the P10 Jenkins build, push, deploy and smoke stages against the stub services in week 2. Extend this pipeline with hardening and nightly evaluation in P10–P11.
 
 ### Useful commands
 ```powershell

@@ -1,7 +1,7 @@
 # P9. Discover workflow, challenge, what-if, compare: **Member 2** (M8 + M3, M1 updates)
 
 > **Owner:** Member 2  
-> Part of the CS4032 *Idea Generator with Go / No-Go* project. Rules: `../rule.md` · Checklist: `../project_completion.md` · Index: `../README.md`
+> Part of the CS4032 *Idea Generator with Go / No-Go* project. [Rules](../rule.md) · [Checklist](../project_completion.md) · [Project index](../../README.md)
 
 
 **Goal:** Discover mode (U2) with a limited debate, plus U7/U8/U9. **[B §3.1]**

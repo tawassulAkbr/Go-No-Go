@@ -1,0 +1,47 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "evidence_id": {
+      "pattern": "^[^#\\s]+#c[0-9]+$",
+      "title": "Evidence Id",
+      "type": "string"
+    },
+    "card_id": {
+      "minLength": 1,
+      "title": "Card Id",
+      "type": "string"
+    },
+    "quote": {
+      "minLength": 1,
+      "title": "Quote",
+      "type": "string"
+    },
+    "source": {
+      "minLength": 1,
+      "title": "Source",
+      "type": "string"
+    },
+    "url": {
+      "format": "uri",
+      "maxLength": 2083,
+      "minLength": 1,
+      "title": "Url",
+      "type": "string"
+    },
+    "retrieved_at": {
+      "format": "date-time",
+      "title": "Retrieved At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "evidence_id",
+    "card_id",
+    "quote",
+    "source",
+    "url",
+    "retrieved_at"
+  ],
+  "title": "Evidence",
+  "type": "object"
+}

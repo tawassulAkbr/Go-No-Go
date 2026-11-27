@@ -1,7 +1,7 @@
 # P11. AgenticOps: **Member 1** (M13)
 
 > **Owner:** Member 1  
-> Part of the CS4032 *Idea Generator with Go / No-Go* project. Rules: `../rule.md` · Checklist: `../project_completion.md` · Index: `../README.md`
+> Part of the CS4032 *Idea Generator with Go / No-Go* project. [Rules](../rule.md) · [Checklist](../project_completion.md) · [Project index](../../README.md)
 
 
 **Goal:** **see** what the agents did, **limit** what they spend, **test** their behaviour, **notice** when they get worse. **[B][G §7]**
