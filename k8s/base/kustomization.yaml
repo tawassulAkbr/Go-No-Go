@@ -13,5 +13,8 @@ configMapGenerator:
   - ORCHESTRATOR_URL=http://orchestrator:8000
   - VERDICT_URL=http://verdict:8000
   - API_BASE=/api
+- name: verdict-config
+  files:
+  - verdict.yaml=config/verdict.yaml
 generatorOptions:
   disableNameSuffixHash: true

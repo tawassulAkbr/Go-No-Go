@@ -525,6 +525,8 @@ spec:
         imagePullPolicy: Always
         envFrom:
         - configMapRef: { name: platform-config }
+        volumeMounts:
+        - { name: verdict-config, mountPath: /app/config, readOnly: true }
         ports: [{ containerPort: 8000 }]
         readinessProbe:
           httpGet: { path: /ready, port: 8000 }
@@ -540,6 +542,9 @@ spec:
         securityContext:
           allowPrivilegeEscalation: false
           capabilities: { drop: [ALL] }
+      volumes:
+      - name: verdict-config
+        configMap: { name: verdict-config }
 ---
 apiVersion: v1
 kind: Service
