@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "idea-validator-ingestion"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["httpx==0.28.1", "qdrant-client==1.12.1"]
+
+[tool.setuptools]
+packages = ["ingestion"]
