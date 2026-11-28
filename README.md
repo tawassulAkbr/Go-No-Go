@@ -419,7 +419,7 @@ Every service exposes `/health` (alive), `/ready` (can serve now) and `/metrics`
 
 ## Data collection and ethics
 
-- Data comes only from official APIs or pages that allow it: Hacker News (Firebase and Algolia), GitHub (REST) and Product Hunt (GraphQL). Reddit is used only if its current API terms allow it.
+- The phase-four snapshot contains 2,297 cards from Hacker News, crates.io and RubyGems. GitHub, Product Hunt and Reddit connectors are available subject to source permissions and credentials. See the [phase-four run instructions and verification results](docs/Phases/P04_data_foundation.md#branch-implementation-and-verification-2026-11-28).
 - We obey `robots.txt`, apply per-domain rate limits, send a clear `User-Agent`, cache responses and back off on errors.
 - No logins and no private data. Each card keeps only a name, public text, public URL and its source; the verdict card links back to the sources.
 - Fetched text may contain instructions aimed at models. M5's sanitiser neutralises them, M12 never obeys them, and a poisoned page can never change a score or verdict.

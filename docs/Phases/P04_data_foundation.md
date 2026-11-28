@@ -70,3 +70,26 @@ Load secrets into the cluster later with (PowerShell): `kubectl create secret ge
 8. **Verify:** run twice; second run `added = 0`. Record counts per source for the report.
 
 **Screenshots/evidence:** `kubectl get cronjob`, a completed scout Job, the card-count query.
+
+### Branch implementation and verification, 2026-11-28
+
+The tested snapshot contains 2,297 cards and produced 2,433 indexed chunks on Qdrant 1.12.4. PostgreSQL counted 847 Hacker News cards, 600 crates.io cards and 850 RubyGems cards. First ingestion added 2,297 cards from 2,298 raw items. Snapshot replay processed all 2,297 cards and added zero. The enabled six-hour scouts use these three sources. Credentialed connectors and the hosted model require the relevant M5 settings.
+
+Run these commands from the repository root in the Python 3.12 development environment. Start the Compose stores, set DATABASE_URL to the database connection URI, REDIS_URL and QDRANT_URL to the Redis and Qdrant endpoints, and TOOLS_URL to the internal tool service or its local development address.
+
+```sh
+python -m pip install -r requirements-dev.txt
+alembic -c services/profile/alembic.ini upgrade head
+python -m ingestion --from-snapshot
+python -m uvicorn services.tools.src.main:app --port 8105
+# From a second shell, set TOOLS_URL=http://127.0.0.1:8105
+python -m scouts --source hn --query "Show HN" --limit 500
+python -m ingestion
+python scripts/export_snapshot.py
+```
+
+M5 reads the model API key, model name and USD-per-million input/output prices from its environment. Set INGEST_ENRICH=1 on ingestion to fill missing fields through M5. Reddit accepts an OAuth access token in REDDIT_ACCESS_TOKEN. Product Hunt accepts PRODUCTHUNT_TOKEN. Only the tools Deployment receives the api-keys Secret. The profile init container migrates the database before the HTTP container starts. For integration tests set TEST_DATABASE_URL to a disposable database and REDIS_URL to a test Redis instance.
+
+Cluster sign-off remains open. The overlay renders locally. The available context during verification was kind-rahbar-ci. The project cluster, completed scout Job and cluster screenshots still require verification on k3d-idea-validator.
+
+The 78-test Python suite passed with the PostgreSQL integration fixture enabled. Rootless Podman built the profile, tools, scouts and ingestion images. The three HTTP apps imported under their image users, and the ingestion image validated all 2,297 packaged cards with networking disabled. The [live PostgreSQL query capture](../evidence/phase4/card-counts.png) shows source counts and both ingestion runs.
