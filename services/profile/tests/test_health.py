@@ -1,16 +1,13 @@
-import httpx
-import pytest
+from fastapi.testclient import TestClient
+import psycopg
+from services.profile.src import main
 
-from services.profile.src.main import app
 
+def test_liveness_and_unavailable_storage(monkeypatch):
+    def unavailable(*args):
+        raise psycopg.OperationalError()
 
-@pytest.mark.asyncio
-async def test_entrypoint_health_and_readiness():
-    async with httpx.AsyncClient(
-        transport=httpx.ASGITransport(app=app), base_url="http://test"
-    ) as client:
-        health = await client.get("/health")
-        ready = await client.get("/ready")
-    assert health.status_code == 200
-    assert health.json() == {"status": "ok", "service": "profile"}
-    assert ready.status_code == 200
+    monkeypatch.setattr(main.store, "one", unavailable)
+    with TestClient(main.app) as client:
+        assert client.get("/health").json() == {"status": "ok", "service": "profile"}
+        assert client.get("/ready").status_code == 503
