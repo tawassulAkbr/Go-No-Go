@@ -7,11 +7,21 @@ resources:
 - stateful.yaml
 - ingress.yaml
 - networkpolicy.yaml
+- cron-scout-hn.yaml
+- cron-scout-github.yaml
+- cron-scout-producthunt.yaml
+- cron-scout-crates.yaml
+- cron-ingestion.yaml
+- cron-scout-rubygems.yaml
+- cron-scout-reddit.yaml
 configMapGenerator:
 - name: platform-config
   literals:
   - ORCHESTRATOR_URL=http://orchestrator:8000
   - VERDICT_URL=http://verdict:8000
+  - REDIS_URL=redis://redis:6379
+  - QDRANT_URL=http://qdrant:6333
+  - TOOLS_URL=http://tools:8000
   - API_BASE=/api
 generatorOptions:
   disableNameSuffixHash: true

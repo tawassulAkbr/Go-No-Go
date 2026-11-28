@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata: { name: scout-reddit, namespace: idea-validator }
+spec:
+  suspend: true
+  schedule: "0 */6 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          securityContext: { runAsNonRoot: true }
+          containers:
+          - name: scout-reddit
+            image: k3d-idea-registry:5001/scouts:0000000
+            command: ["python","-m","scouts","--source","reddit","--limit","600"]
+            envFrom:
+            - configMapRef: { name: platform-config }
+            env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: platform-secrets, key: POSTGRES_PASSWORD }
+            resources:
+              requests: { cpu: 50m, memory: 96Mi }
+              limits: { cpu: 500m, memory: 512Mi }
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: [ALL] }

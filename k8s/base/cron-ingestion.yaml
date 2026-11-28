@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata: { name: ingestion, namespace: idea-validator }
+spec:
+  schedule: "30 */6 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          securityContext: { runAsNonRoot: true }
+          containers:
+          - name: ingestion
+            image: k3d-idea-registry:5001/ingestion:0000000
+            command: ["python","-m","ingestion"]
+            envFrom:
+            - configMapRef: { name: platform-config }
+            env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: platform-secrets, key: POSTGRES_PASSWORD }
+            resources:
+              requests: { cpu: 50m, memory: 96Mi }
+              limits: { cpu: 500m, memory: 512Mi }
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: [ALL] }
