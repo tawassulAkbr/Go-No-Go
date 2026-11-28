@@ -11,6 +11,7 @@ FROM ${PYTHON_IMAGE}
 WORKDIR /app
 COPY --from=build /install /usr/local
 COPY services/tools/src/ /app/src/
+COPY config/ /app/config/
 USER 10001:10001
 EXPOSE 8000
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

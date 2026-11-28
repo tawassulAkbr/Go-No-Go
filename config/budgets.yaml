@@ -1,0 +1,1 @@
+{"pages_per_run": 80, "requests_per_second": 1, "burst": 4, "max_bytes": 2097152, "llm_tokens_per_run": 32000}
