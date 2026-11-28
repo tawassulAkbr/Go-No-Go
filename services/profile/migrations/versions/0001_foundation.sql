@@ -1,0 +1,16 @@
+CREATE TABLE users (id text PRIMARY KEY, email text NOT NULL UNIQUE, hash text NOT NULL);
+CREATE TABLE profiles (user_id text PRIMARY KEY REFERENCES users, profile jsonb NOT NULL, version integer NOT NULL CHECK(version > 0));
+CREATE TABLE ideas (id text PRIMARY KEY, user_id text NOT NULL REFERENCES users, created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE idea_versions (idea_id text REFERENCES ideas, version integer CHECK(version > 0), body jsonb NOT NULL, PRIMARY KEY(idea_id,version));
+CREATE TABLE runs (run_id text PRIMARY KEY, user_id text NOT NULL REFERENCES users, idea_id text REFERENCES ideas, mode text NOT NULL CHECK(mode IN ('discover','validate')), state text NOT NULL, state_json jsonb NOT NULL, budget_json jsonb NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE verdicts (run_id text PRIMARY KEY REFERENCES runs, idea_id text NOT NULL, version integer NOT NULL, body jsonb NOT NULL, versions jsonb NOT NULL, gates jsonb NOT NULL, missing_evidence jsonb NOT NULL, FOREIGN KEY(idea_id,version) REFERENCES idea_versions);
+CREATE TABLE dimension_scores (run_id text REFERENCES verdicts, dimension text, abstained boolean NOT NULL, features jsonb NOT NULL, rubric_version text NOT NULL, model text NOT NULL, body jsonb NOT NULL, PRIMARY KEY(run_id,dimension));
+CREATE TABLE conversations (id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, run_id text REFERENCES runs, message jsonb NOT NULL);
+CREATE TABLE approvals (id text PRIMARY KEY, run_id text NOT NULL REFERENCES runs, reason text NOT NULL, decision boolean);
+CREATE TABLE traces_index (id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, run_id text REFERENCES runs, trace jsonb NOT NULL);
+CREATE TABLE cards (id text PRIMARY KEY, url text NOT NULL UNIQUE, name_key text NOT NULL UNIQUE, source text NOT NULL, card jsonb NOT NULL);
+CREATE TABLE card_sources (source text, url text, card_id text NOT NULL REFERENCES cards, PRIMARY KEY(source,url));
+CREATE TABLE niches (name text PRIMARY KEY);
+CREATE TABLE niche_stats (niche text REFERENCES niches, measured_at timestamptz DEFAULT now(), stats jsonb NOT NULL, PRIMARY KEY(niche,measured_at));
+CREATE TABLE raw_items (source text, url text, item jsonb NOT NULL, pending boolean NOT NULL DEFAULT true, PRIMARY KEY(source,url));
+CREATE TABLE ingestion_runs (id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, run_id text NOT NULL, source text NOT NULL, added integer NOT NULL, dropped integer NOT NULL, counts jsonb NOT NULL, duration_s double precision NOT NULL, error text, created_at timestamptz DEFAULT now());

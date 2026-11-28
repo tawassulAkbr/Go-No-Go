@@ -1,1 +1,6 @@
 uvicorn==0.34.2
+alembic==1.16.5
+SQLAlchemy==2.0.44
+psycopg[binary]==3.2.12
+redis==6.4.0
+email-validator==2.3.0
