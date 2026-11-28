@@ -5,7 +5,7 @@ from services.scouts.src.main import app
 
 
 @pytest.mark.asyncio
-async def test_entrypoint_health_and_readiness():
+async def test_entrypoint_health_and_readiness(migrated_db):
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app), base_url="http://test"
     ) as client:

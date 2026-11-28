@@ -5,7 +5,9 @@ COPY libs/contracts /build/contracts
 COPY libs/platform_stub /build/platform_stub
 COPY libs/tracing /build/tracing
 COPY services/scouts/requirements.txt /build/requirements.txt
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt /build/contracts /build/tracing /build/platform_stub
+COPY libs/foundation /build/foundation
+COPY services/scouts /build/scouts
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt /build/contracts /build/tracing /build/platform_stub /build/foundation /build/scouts
 
 FROM ${PYTHON_IMAGE}
 WORKDIR /app
