@@ -34,3 +34,24 @@ M1 is the browser entry point. Ingress adds the public prefix `/api` and strips 
 | M12 Critic | POST /check | Check claims and their evidence IDs. Return support or rejection per claim. |
 | M13 AgenticOps | POST /trace | Append a batch of Trace records. |
 | M13 AgenticOps | GET /runs/{id}/trace | Retrieve the steps recorded under the run ID. |
+
+### Phase 4 service interfaces
+
+All M2 paths are internal. The gateway supplies the authenticated user ID when calling user-scoped endpoints.
+
+| Method and path | Input and result |
+|---|---|
+| POST /users, POST /users/authenticate | Email and password. Returns the user ID and email. Duplicate registration returns 409 and invalid credentials return 401. |
+| GET or PUT /users/{uid}/profile | PUT accepts the shared Profile record. Both return the Profile fields and its integer version. Identical writes preserve the version. |
+| POST /users/{uid}/ideas, POST /users/{uid}/ideas/{id}/versions | Accept an idea JSON object and return its ID, version and stored body. |
+| GET /users/{uid}/ideas, GET /users/{uid}/history, GET /users/{uid}/ideas/{id}/versions | Return saved versions and associated verdicts, newest first within each idea. |
+| GET /users/{uid}/compare?a={id}&b={id} | Returns each idea's latest version and verdicts. |
+| PUT or GET /runs/{id} | Persist or resume a run with user, idea, mode, state, state JSON and budget JSON. |
+| POST /verdicts, GET /runs/{id}/verdict | Store the shared Verdict and six dimension rows in one transaction, or retrieve the complete verdict. |
+| POST /approvals, PUT /approvals/{id}, GET /runs/{id}/approvals | Open an approval with a run ID and reason, submit a boolean decision, or list a run's approvals. |
+| POST /cache/write, POST /cache/read | Supply a run ID and typed key. Writes include a JSON value. Reads include the value, cache_hit and X-Cache header. Entries expire after one hour. |
+| M4 POST /scout | Supply source, run_id, optional query and limit. Completed pages persist even when a later page fails. |
+| M5 POST /fetch | Supply run_id, purpose and either url or connector plus params. Search results include normalized items, cursor, escaped content, source URL, timestamp and flags. |
+| M5 POST /llm | Supply run_id, messages, optional output_schema and max_tokens. Returns content, model, token usage and estimated cost. Budget exhaustion returns 402. |
+
+M5 supports hn, github, producthunt, reddit, crates and rubygems. Connector parameters include operation (search or get), query, page (zero-based), size, cursor and id. Hacker News also accepts topstories and newstories. GitHub accepts kind repositories or issues. Service OpenAPI documents the request models.
