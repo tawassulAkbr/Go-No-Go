@@ -105,12 +105,30 @@ spec:
     metadata: { labels: { app: profile } }
     spec:
       securityContext: { runAsNonRoot: true }
+      initContainers:
+      - name: migrate
+        image: k3d-idea-registry:5001/profile:0000000
+        command: ["alembic","upgrade","head"]
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef: { name: platform-secrets, key: POSTGRES_PASSWORD }
+        resources:
+          requests: { cpu: 25m, memory: 64Mi }
+          limits: { cpu: 250m, memory: 256Mi }
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: { drop: [ALL] }
       containers:
       - name: profile
         image: k3d-idea-registry:5001/profile:0000000
         imagePullPolicy: Always
         envFrom:
         - configMapRef: { name: platform-config }
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef: { name: platform-secrets, key: POSTGRES_PASSWORD }
         ports: [{ containerPort: 8000 }]
         readinessProbe:
           httpGet: { path: /ready, port: 8000 }
@@ -203,6 +221,10 @@ spec:
         imagePullPolicy: Always
         envFrom:
         - configMapRef: { name: platform-config }
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef: { name: platform-secrets, key: POSTGRES_PASSWORD }
         ports: [{ containerPort: 8000 }]
         readinessProbe:
           httpGet: { path: /ready, port: 8000 }
@@ -249,6 +271,7 @@ spec:
         imagePullPolicy: Always
         envFrom:
         - configMapRef: { name: platform-config }
+        - secretRef: { name: api-keys, optional: true }
         ports: [{ containerPort: 8000 }]
         readinessProbe:
           httpGet: { path: /ready, port: 8000 }
